@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,32 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Management - Event Booking System</title>
     <link rel="stylesheet" href="style.css">
+
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f9; color: #222; }
-        header { background: #222; color: white; padding: 16px 25px; display: flex; justify-content: space-between; align-items: center; }
-        header button { background: white; color: #222; border: none; padding: 9px 16px; cursor: pointer; border-radius: 4px; }
-        main { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
-        .panel { background: white; padding: 22px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px #0000000a; }
-        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        input, textarea, select { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        textarea { min-height: 75px; }
-        button { padding: 10px 15px; border: none; border-radius: 5px; background: #333; color: white; cursor: pointer; }
-        button:hover { opacity: .85; }
-        .secondary { background: #777; }
-        .danger { background: #c0392b; }
-        .actions { display: flex; gap: 8px; margin-top: 16px; }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border-bottom: 1px solid #ddd; padding: 11px; text-align: left; font-size: 13px; }
-        th { background: #f4f4f4; }
-        .row-actions { display: flex; gap: 6px; }
-        .message { margin-top: 12px; font-size: 14px; }
-        .error { color: #b42318; }
-        .success { color: #137333; }
-        @media (max-width: 650px) { .form-grid { grid-template-columns: 1fr; } }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #222;
+        }
+
+        header {
+            background: #222;
+            color: white;
+            padding: 16px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header button {
+            background: white;
+            color: #222;
+            border: none;
+            padding: 9px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .panel {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0000000a;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        textarea {
+            min-height: 75px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: .85;
+        }
+
+        .secondary {
+            background: #777;
+        }
+
+        .danger {
+            background: #c0392b;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 11px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .message {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #b42318;
+        }
+
+        .success {
+            color: #137333;
+        }
+
+        @media (max-width: 650px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
+
 <body>
 
 <header>
@@ -40,16 +156,20 @@
 </header>
 
 <main>
+
+    <!-- USER INFORMATION -->
     <section class="panel">
         <h2 id="welcome">Welcome</h2>
         <p id="roleText"></p>
     </section>
 
+    <!-- ADD / EDIT EVENT -->
     <section class="panel">
         <h2 id="formTitle">Add New Event</h2>
 
         <form id="eventForm">
             <div class="form-grid">
+
                 <div>
                     <label for="title">Event Title</label>
                     <input id="title" required minlength="3" maxlength="150">
@@ -67,7 +187,8 @@
 
                 <div>
                     <label for="ticket_price">Ticket Price (RM)</label>
-                    <input id="ticket_price" type="number" min="0" step="0.01" required>
+                    <input id="ticket_price" type="number"
+                           min="0" step="0.01" required>
                 </div>
 
                 <div>
@@ -84,6 +205,7 @@
                         <option value="completed">Completed</option>
                     </select>
                 </div>
+
             </div>
 
             <div style="margin-top:14px">
@@ -93,16 +215,22 @@
 
             <div class="actions">
                 <button type="submit" id="saveBtn">Add Event</button>
-                <button type="button" class="secondary" onclick="resetForm()">Cancel / Clear</button>
+                <button type="button" class="secondary"
+                        onclick="resetForm()">Cancel / Clear</button>
             </div>
+
             <p id="formMessage" class="message" aria-live="polite"></p>
         </form>
     </section>
 
+    <!-- EVENT LIST -->
     <section class="panel">
         <h2>Event List</h2>
+
         <div class="actions">
-            <input id="searchInput" placeholder="Search events by title or description">
+            <input id="searchInput"
+                   placeholder="Search events by title or description">
+
             <button onclick="loadEvents()">Search</button>
             <button class="secondary" onclick="clearSearch()">Clear</button>
         </div>
@@ -127,14 +255,88 @@
             </table>
         </div>
     </section>
+
+    <!-- RELEVANT BOOKING RECORDS -->
+    <section class="panel">
+        <h2>Relevant Booking Records</h2>
+
+        <p>
+            View bookings according to your role and
+            permissions.
+        </p>
+
+        <div class="actions">
+            <input id="bookingSearch"
+                   placeholder="Search by event name or booking ID">
+
+            <select id="bookingStatus">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <button onclick="loadBookings()">Search</button>
+
+            <button class="secondary"
+                    onclick="clearBookingSearch()">Clear</button>
+
+            <button class="secondary"
+                    onclick="loadBookings()">Refresh</button>
+        </div>
+
+        <p id="bookingMessage" class="message" aria-live="polite"></p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Event</th>
+                        <th>Event Date</th>
+                        <th>Quantity</th>
+                        <th>Total Price (RM)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingRows"></tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <button class="secondary"
+                    id="prevBookingBtn"
+                    onclick="changeBookingPage(-1)">
+                Previous
+            </button>
+
+            <span id="bookingPageInfo" style="align-self:center;">
+                Page 1
+            </span>
+
+            <button class="secondary"
+                    id="nextBookingBtn"
+                    onclick="changeBookingPage(1)">
+                Next
+            </button>
+        </div>
+    </section>
+
 </main>
 
 <script>
 const API = "../backend/events.php";
+const BOOKING_API = "../backend/bookings.php";
 const token = localStorage.getItem("token");
+
 let currentUser = null;
 let events = [];
 let editingId = null;
+
+let bookingPage = 1;
+let bookingTotalPages = 1;
 
 try {
     currentUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -142,6 +344,7 @@ try {
     currentUser = null;
 }
 
+// CHECK LOGIN AND ROLE
 if (!token || !currentUser) {
     window.location.replace("login.html");
 } else if (!["Administrator", "Organiser", "Staff"].includes(currentUser.role)) {
@@ -150,17 +353,22 @@ if (!token || !currentUser) {
 } else {
     document.getElementById("welcome").textContent =
         "Welcome, " + (currentUser.name || "User");
+
     document.getElementById("roleText").textContent =
         "Role: " + currentUser.role;
+
     loadEvents();
+    loadBookings();
 }
 
+// LOGOUT
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "login.html";
 }
 
+// API REQUEST
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         ...options,
@@ -183,43 +391,54 @@ async function apiRequest(url, options = {}) {
         const details = Array.isArray(data.errors)
             ? " " + data.errors.map(e => e.message).join("; ")
             : "";
+
         throw new Error((data.message || "Request failed") + details);
     }
 
     return data;
 }
 
+// DISPLAY MESSAGE
 function showMessage(id, message, success = false) {
     const element = document.getElementById(id);
     element.textContent = message;
     element.className = "message " + (success ? "success" : "error");
 }
 
+// LOAD EVENTS
 async function loadEvents() {
     const search = document.getElementById("searchInput").value.trim();
+
     const url = API + "?limit=100" +
         (search ? "&search=" + encodeURIComponent(search) : "");
 
     try {
         const result = await apiRequest(url);
+
         events = result.data || [];
         renderEvents();
+
         showMessage(
             "listMessage",
-            events.length ? events.length + " event(s) loaded." : "No events found.",
+            events.length
+                ? events.length + " event(s) loaded."
+                : "No events found.",
             true
         );
+
     } catch (error) {
         showMessage("listMessage", error.message);
     }
 }
 
+// DISPLAY EVENTS
 function renderEvents() {
     const tbody = document.getElementById("eventRows");
     tbody.replaceChildren();
 
     events.forEach(event => {
         const tr = document.createElement("tr");
+
         const values = [
             event.event_id,
             event.title,
@@ -248,8 +467,9 @@ function renderEvents() {
         deleteBtn.className = "danger";
         deleteBtn.onclick = () => deleteEvent(event.event_id);
 
-        // Only Administrators or the event organiser can modify an event.
-        const canModify = currentUser.role === "Administrator" ||
+        // Only Administrator or event owner can modify
+        const canModify =
+            currentUser.role === "Administrator" ||
             Number(event.organiser_id) === Number(currentUser.user_id);
 
         if (canModify) {
@@ -263,84 +483,277 @@ function renderEvents() {
     });
 }
 
+// EDIT EVENT
 function editEvent(id) {
-    const event = events.find(e => Number(e.event_id) === Number(id));
+    const event = events.find(
+        e => Number(e.event_id) === Number(id)
+    );
+
     if (!event) return;
 
     editingId = id;
+
     document.getElementById("title").value = event.title;
-    document.getElementById("description").value = event.description || "";
+    document.getElementById("description").value =
+        event.description || "";
     document.getElementById("venue_id").value = event.venue_id;
+
     document.getElementById("event_date").value =
         String(event.event_date).replace(" ", "T").slice(0, 16);
-    document.getElementById("ticket_price").value = event.ticket_price;
-    document.getElementById("total_tickets").value = event.total_tickets;
+
+    document.getElementById("ticket_price").value =
+        event.ticket_price;
+
+    document.getElementById("total_tickets").value =
+        event.total_tickets;
+
     document.getElementById("status").value = event.status;
 
-    document.getElementById("formTitle").textContent = "Edit Event #" + id;
-    document.getElementById("saveBtn").textContent = "Update Event";
-    document.getElementById("eventForm").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("formTitle").textContent =
+        "Edit Event #" + id;
+
+    document.getElementById("saveBtn").textContent =
+        "Update Event";
+
+    document.getElementById("eventForm").scrollIntoView({
+        behavior: "smooth"
+    });
 }
 
+// RESET EVENT FORM
 function resetForm() {
     editingId = null;
     document.getElementById("eventForm").reset();
-    document.getElementById("formTitle").textContent = "Add New Event";
-    document.getElementById("saveBtn").textContent = "Add Event";
+
+    document.getElementById("formTitle").textContent =
+        "Add New Event";
+
+    document.getElementById("saveBtn").textContent =
+        "Add Event";
+
     document.getElementById("formMessage").textContent = "";
 }
 
-document.getElementById("eventForm").addEventListener("submit", async event => {
-    event.preventDefault();
+// SAVE EVENT
+document.getElementById("eventForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
 
-    const payload = {
-        title: document.getElementById("title").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        venue_id: Number(document.getElementById("venue_id").value),
-        event_date: document.getElementById("event_date").value
-            .replace("T", " ") + ":00",
-        ticket_price: Number(document.getElementById("ticket_price").value),
-        total_tickets: Number(document.getElementById("total_tickets").value),
-        status: document.getElementById("status").value
-    };
+        const payload = {
+            title: document.getElementById("title").value.trim(),
+            description: document.getElementById("description").value.trim(),
+            venue_id: Number(document.getElementById("venue_id").value),
 
-    const isEditing = editingId !== null;
+            event_date: document.getElementById("event_date").value
+                .replace("T", " ") + ":00",
+
+            ticket_price: Number(
+                document.getElementById("ticket_price").value
+            ),
+
+            total_tickets: Number(
+                document.getElementById("total_tickets").value
+            ),
+
+            status: document.getElementById("status").value
+        };
+
+        const isEditing = editingId !== null;
+
+        try {
+            const result = await apiRequest(
+                isEditing ? API + "?id=" + editingId : API,
+                {
+                    method: isEditing ? "PUT" : "POST",
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            resetForm();
+
+            showMessage(
+                "formMessage",
+                result.message || "Event saved.",
+                true
+            );
+
+            await loadEvents();
+
+        } catch (error) {
+            showMessage("formMessage", error.message);
+        }
+    }
+);
+
+// DELETE EVENT
+async function deleteEvent(id) {
+    if (!confirm(
+        "Are you sure you want to delete Event #" + id + "?"
+    )) {
+        return;
+    }
 
     try {
         const result = await apiRequest(
-            isEditing ? API + "?id=" + editingId : API,
-            {
-                method: isEditing ? "PUT" : "POST",
-                body: JSON.stringify(payload)
-            }
+            API + "?id=" + id,
+            { method: "DELETE" }
         );
 
-        resetForm();
-        showMessage("formMessage", result.message || "Event saved.", true);
-        await loadEvents();
-    } catch (error) {
-        showMessage("formMessage", error.message);
-    }
-});
+        showMessage(
+            "listMessage",
+            result.message || "Event deleted.",
+            true
+        );
 
-async function deleteEvent(id) {
-    if (!confirm("Are you sure you want to delete Event #" + id + "?")) return;
-
-    try {
-        const result = await apiRequest(API + "?id=" + id, {
-            method: "DELETE"
-        });
-        showMessage("listMessage", result.message || "Event deleted.", true);
         await loadEvents();
+
     } catch (error) {
         showMessage("listMessage", error.message);
     }
 }
 
+// CLEAR EVENT SEARCH
 function clearSearch() {
     document.getElementById("searchInput").value = "";
     loadEvents();
 }
+
+// LOAD RELEVANT BOOKINGS
+async function loadBookings() {
+    const tbody = document.getElementById("bookingRows");
+
+    tbody.replaceChildren();
+
+    showMessage("bookingMessage", "Loading bookings...", true);
+
+    const search = document.getElementById("bookingSearch").value.trim();
+    const status = document.getElementById("bookingStatus").value;
+
+    const params = new URLSearchParams({
+        page: bookingPage,
+        limit: 10
+    });
+
+    if (search) {
+        params.set("search", search);
+    }
+
+    if (status) {
+        params.set("status", status);
+    }
+
+    try {
+        const result = await apiRequest(
+            BOOKING_API + "?" + params.toString()
+        );
+
+        const bookings = Array.isArray(result.data)
+            ? result.data
+            : [];
+
+        const pagination = result.pagination || {};
+
+        bookingTotalPages = Math.max(
+            1,
+            Number(pagination.totalPages) || 1
+        );
+
+        document.getElementById("bookingPageInfo").textContent =
+            "Page " + bookingPage + " of " + bookingTotalPages;
+
+        document.getElementById("prevBookingBtn").disabled =
+            bookingPage <= 1;
+
+        document.getElementById("nextBookingBtn").disabled =
+            bookingPage >= bookingTotalPages;
+
+        if (bookings.length === 0) {
+            showMessage(
+                "bookingMessage",
+                "No relevant bookings found.",
+                true
+            );
+            return;
+        }
+
+        bookings.forEach(booking => {
+            const tr = document.createElement("tr");
+
+            const values = [
+                booking.booking_id,
+                booking.customer_name || booking.user_id,
+                booking.event_name || booking.event_id,
+                booking.event_date || "-",
+                booking.quantity,
+                "RM " + Number(booking.total_price).toFixed(2),
+                booking.booking_status || booking.status || "-"
+            ];
+
+            values.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value ?? "-";
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+
+        showMessage(
+            "bookingMessage",
+            (pagination.total ?? bookings.length) +
+                " relevant booking(s) found.",
+            true
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        showMessage(
+            "bookingMessage",
+            error.message || "Unable to load bookings."
+        );
+    }
+}
+
+// BOOKING PAGINATION
+function changeBookingPage(direction) {
+    const nextPage = bookingPage + direction;
+
+    if (nextPage < 1 || nextPage > bookingTotalPages) {
+        return;
+    }
+
+    bookingPage = nextPage;
+    loadBookings();
+}
+
+// CLEAR BOOKING SEARCH
+function clearBookingSearch() {
+    document.getElementById("bookingSearch").value = "";
+    document.getElementById("bookingStatus").value = "";
+
+    bookingPage = 1;
+    loadBookings();
+}
+
+// RESET PAGE WHEN SEARCH FILTER CHANGES
+document.getElementById("bookingSearch").addEventListener(
+    "input",
+    () => {
+        bookingPage = 1;
+    }
+);
+
+document.getElementById("bookingStatus").addEventListener(
+    "change",
+    () => {
+        bookingPage = 1;
+        loadBookings();
+    }
+);
+
 </script>
+
 </body>
 </html>

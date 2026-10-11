@@ -1,10 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>User Management - Event Booking System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Dashboard - Event Booking System</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .records-section {
+            margin-top: 25px;
+        }
+        .records-section h3 {
+            margin-top: 25px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .table-wrapper table {
+            width: 100%;
+        }
+        .record-message {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .record-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,24 +36,21 @@
 <div class="navbar">
     <div>
         <strong>Event Booking System</strong>
-        <span> | User Management</span>
+        <span> | Administrator Dashboard</span>
     </div>
-
     <button onclick="logout()">Logout</button>
 </div>
 
 <div class="container">
 
-    <!-- USER INFORMATION -->
+    <!-- ADMIN INFORMATION -->
     <div class="card">
         <h2>Welcome, <span id="adminName"></span></h2>
         <p>Role: <strong id="adminRole"></strong></p>
     </div>
 
-
     <!-- ADD / EDIT USER -->
     <div class="card">
-
         <h2 id="formTitle">Add New User</h2>
 
         <input type="hidden" id="userId">
@@ -42,15 +63,11 @@
 
         <div id="passwordSection">
             <label>Password</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Enter password"
-            >
+            <input type="password" id="password"
+                   placeholder="Enter password">
         </div>
 
         <label>Role</label>
-
         <select id="role">
             <option value="Administrator">Administrator</option>
             <option value="Organiser">Organiser</option>
@@ -58,98 +75,147 @@
             <option value="Customer" selected>Customer</option>
         </select>
 
-        <button
-            class="add-btn"
-            id="saveButton"
-            onclick="saveUser()"
-        >
-            Add User
-        </button>
+        <button class="add-btn" id="saveButton"
+                onclick="saveUser()">Add User</button>
 
-        <button
-            id="cancelButton"
-            onclick="cancelEdit()"
-            style="display:none;"
-        >
-            Cancel
-        </button>
+        <button id="cancelButton"
+                onclick="cancelEdit()"
+                style="display:none;">Cancel</button>
 
-        <p id="message"></p>
-
+        <p id="message" aria-live="polite"></p>
     </div>
-
 
     <!-- USER LIST -->
     <div class="card">
-
         <h2>User List</h2>
 
-        <table>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable"></tbody>
+            </table>
+        </div>
+    </div>
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+    <!-- SYSTEM RECORDS -->
+    <div class="card records-section">
+        <h2>System Records</h2>
+        <p>
+            View event, venue and booking records
+            according to Administrator permissions.
+        </p>
 
-            <tbody id="userTable"></tbody>
+        <div class="record-actions">
+            <button class="add-btn" onclick="loadSystemRecords()">
+                Refresh Records
+            </button>
+        </div>
 
-        </table>
+        <h3>Event Records</h3>
+        <p id="eventsMessage" class="record-message"
+           aria-live="polite"></p>
 
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Event</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Available Tickets</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="eventsRecords"></tbody>
+            </table>
+        </div>
+
+        <h3>Venue Records</h3>
+        <p id="venuesMessage" class="record-message"
+           aria-live="polite"></p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Venue</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="venuesRecords"></tbody>
+            </table>
+        </div>
+
+        <h3>Booking Records</h3>
+        <p id="bookingsMessage" class="record-message"
+           aria-live="polite"></p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer ID</th>
+                        <th>Event ID</th>
+                        <th>Quantity</th>
+                        <th>Total Price (RM)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsRecords"></tbody>
+            </table>
+        </div>
     </div>
 
 </div>
 
-
 <script>
-
 const API_URL = "../backend/users.php";
-
 const token = localStorage.getItem("token");
-const currentUser =
-    JSON.parse(localStorage.getItem("user"));
 
+let currentUser = null;
 
-// ===============================
+try {
+    currentUser = JSON.parse(localStorage.getItem("user"));
+} catch (error) {
+    currentUser = null;
+}
+
 // CHECK LOGIN
-// ===============================
-
 if (!token || !currentUser) {
-
     window.location.href = "login.html";
-
 } else if (currentUser.role !== "Administrator") {
-
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     window.location.href = "login.html";
-
 } else {
-
-    document.getElementById("adminName").innerText =
+    document.getElementById("adminName").textContent =
         currentUser.name;
 
-    document.getElementById("adminRole").innerText =
+    document.getElementById("adminRole").textContent =
         currentUser.role;
 
     loadUsers();
+    loadSystemRecords();
 }
 
-
-// ===============================
 // GET USERS
-// ===============================
-
 async function loadUsers() {
-
     try {
-
         const response = await fetch(API_URL, {
             method: "GET",
-
             headers: {
                 "Authorization": "Bearer " + token
             }
@@ -159,352 +225,335 @@ async function loadUsers() {
 
         if (response.status === 401 ||
             response.status === 403) {
-
-            localStorage.clear();
-            window.location.href = "login.html";
+            logout();
             return;
         }
 
-        const table =
-            document.getElementById("userTable");
-
+        const table = document.getElementById("userTable");
         table.innerHTML = "";
 
-        // Support both API response formats
         const users = data.data;
 
-        if (!users || !Array.isArray(users)) {
-
-            console.log("API Response:", data);
-
-            document.getElementById("message").className =
-                "error";
-
-            document.getElementById("message").innerText =
-                "Unable to display user list.";
-
+        if (!Array.isArray(users)) {
+            showMessage("Unable to display user list.", "error");
             return;
         }
 
         users.forEach(user => {
-
             const row = document.createElement("tr");
 
-            row.innerHTML = `
-                <td>${user.user_id}</td>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.role}</td>
+            // Use textContent to avoid injecting user data as HTML
+            [
+                user.user_id,
+                user.name,
+                user.email,
+                user.role
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value ?? "-";
+                row.appendChild(cell);
+            });
 
-                <td>
-                    <button
-                        class="edit-btn"
-                        onclick='editUser(${JSON.stringify(user)})'>
-                        Edit
-                    </button>
+            const actionCell = document.createElement("td");
 
-                    <button
-                        class="delete-btn"
-                        onclick="deleteUser(${user.user_id})">
-                        Delete
-                    </button>
-                </td>
-            `;
+            const editButton = document.createElement("button");
+            editButton.className = "edit-btn";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => editUser(user));
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete-btn";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () =>
+                deleteUser(user.user_id)
+            );
+
+            actionCell.appendChild(editButton);
+            actionCell.appendChild(document.createTextNode(" "));
+            actionCell.appendChild(deleteButton);
+            row.appendChild(actionCell);
 
             table.appendChild(row);
         });
 
     } catch (error) {
-
         console.error(error);
-
-        document.getElementById("message").className =
-            "error";
-
-        document.getElementById("message").innerText =
-            "Failed to load users.";
+        showMessage("Failed to load users.", "error");
     }
 }
 
-// ===============================
 // ADD OR UPDATE USER
-// ===============================
-
 async function saveUser() {
+    const userId = document.getElementById("userId").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
 
-    const userId =
-        document.getElementById("userId").value;
+    showMessage("", "");
 
-    const name =
-        document.getElementById("name").value.trim();
-
-    const email =
-        document.getElementById("email").value.trim();
-
-    const password =
-        document.getElementById("password").value;
-
-    const role =
-        document.getElementById("role").value;
-
-    const message =
-        document.getElementById("message");
-
-
-    message.className = "";
-    message.innerText = "";
-
-
-    if (name === "" || email === "") {
-
-        message.className = "error";
-        message.innerText =
-            "Name and email are required.";
-
+    if (!name || !email) {
+        showMessage("Name and email are required.", "error");
         return;
     }
 
-
-    // ADD USER
-    if (userId === "") {
-
-        if (password === "") {
-
-            message.className = "error";
-            message.innerText =
-                "Password is required.";
-
-            return;
-        }
-
-
-        const response = await fetch(API_URL, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-
-            body: JSON.stringify({
-                name,
-                email,
-                password,
-                role
-            })
-
-        });
-
-
-        const data = await response.json();
-
-
-        if (response.ok) {
-
-            message.className = "success";
-            message.innerText =
-                "User added successfully.";
-
-            clearForm();
-            loadUsers();
-
-        } else {
-
-            message.className = "error";
-            message.innerText = data.message;
-        }
-
+    if (!userId && !password) {
+        showMessage("Password is required.", "error");
+        return;
     }
 
-    // UPDATE USER
-    else {
+    try {
+        let response;
 
-        const response = await fetch(
-            API_URL + "?id=" + userId,
-            {
-
-                method: "PUT",
-
+        if (!userId) {
+            response = await fetch(API_URL, {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization":
-                        "Bearer " + token
+                    "Authorization": "Bearer " + token
                 },
-
                 body: JSON.stringify({
                     name,
                     email,
+                    password,
                     role
                 })
-
-            }
-        );
-
+            });
+        } else {
+            response = await fetch(
+                API_URL + "?id=" + encodeURIComponent(userId),
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        role
+                    })
+                }
+            );
+        }
 
         const data = await response.json();
 
-
         if (response.ok) {
-
-            message.className = "success";
-            message.innerText =
-                "User updated successfully.";
+            showMessage(
+                userId
+                    ? "User updated successfully."
+                    : "User added successfully.",
+                "success"
+            );
 
             clearForm();
-            loadUsers();
-
+            await loadUsers();
         } else {
-
-            message.className = "error";
-            message.innerText = data.message;
+            showMessage(
+                data.message || "Unable to save user.",
+                "error"
+            );
         }
+
+    } catch (error) {
+        console.error(error);
+        showMessage("Connection error. Please try again.", "error");
     }
 }
 
-
-// ===============================
-// EDIT USER
-// ===============================
-
-function editUser(user) {
-
-    document.getElementById("userId").value =
-        user.user_id;
-
-    document.getElementById("name").value =
-        user.name;
-
-    document.getElementById("email").value =
-        user.email;
-
-    document.getElementById("role").value =
-        user.role;
-
-
-    document.getElementById(
-        "passwordSection"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "formTitle"
-    ).innerText = "Edit User";
-
-
-    document.getElementById(
-        "saveButton"
-    ).innerText = "Update User";
-
-
-    document.getElementById(
-        "cancelButton"
-    ).style.display = "inline-block";
+function showMessage(text, type) {
+    const message = document.getElementById("message");
+    message.className = type;
+    message.textContent = text;
 }
 
+// EDIT USER
+function editUser(user) {
+    document.getElementById("userId").value = user.user_id;
+    document.getElementById("name").value = user.name;
+    document.getElementById("email").value = user.email;
+    document.getElementById("role").value = user.role;
 
-// ===============================
+    document.getElementById("passwordSection").style.display = "none";
+    document.getElementById("formTitle").textContent = "Edit User";
+    document.getElementById("saveButton").textContent = "Update User";
+    document.getElementById("cancelButton").style.display =
+        "inline-block";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 // DELETE USER
-// ===============================
-
 async function deleteUser(id) {
-
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this user?"
-    );
-
-    if (!confirmDelete) {
+    if (!confirm("Are you sure you want to delete this user?")) {
         return;
     }
 
-
-    const response = await fetch(
-        API_URL + "?id=" + id,
-        {
-
-            method: "DELETE",
-
-            headers: {
-                "Authorization":
-                    "Bearer " + token
+    try {
+        const response = await fetch(
+            API_URL + "?id=" + encodeURIComponent(id),
+            {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
             }
+        );
 
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("User deleted successfully.");
+            await loadUsers();
+        } else {
+            alert(data.message || "Unable to delete user.");
         }
-    );
 
-
-    const data = await response.json();
-
-
-    if (response.ok) {
-
-        alert("User deleted successfully.");
-
-        loadUsers();
-
-    } else {
-
-        alert(data.message);
+    } catch (error) {
+        console.error(error);
+        alert("Failed to delete user.");
     }
 }
 
-
-// ===============================
 // CANCEL EDIT
-// ===============================
-
 function cancelEdit() {
-
     clearForm();
-
-    document.getElementById(
-        "message"
-    ).innerText = "";
+    showMessage("", "");
 }
 
-
-// ===============================
 // CLEAR FORM
-// ===============================
-
 function clearForm() {
-
     document.getElementById("userId").value = "";
     document.getElementById("name").value = "";
     document.getElementById("email").value = "";
     document.getElementById("password").value = "";
     document.getElementById("role").value = "Customer";
 
-    document.getElementById(
-        "passwordSection"
-    ).style.display = "block";
-
-    document.getElementById(
-        "formTitle"
-    ).innerText = "Add New User";
-
-    document.getElementById(
-        "saveButton"
-    ).innerText = "Add User";
-
-    document.getElementById(
-        "cancelButton"
-    ).style.display = "none";
+    document.getElementById("passwordSection").style.display = "block";
+    document.getElementById("formTitle").textContent = "Add New User";
+    document.getElementById("saveButton").textContent = "Add User";
+    document.getElementById("cancelButton").style.display = "none";
 }
 
+// SYSTEM RECORDS
+async function loadRecordTable(endpoint, tableId, messageId, fields) {
+    const table = document.getElementById(tableId);
+    const message = document.getElementById(messageId);
 
-// ===============================
+    table.innerHTML = "";
+    message.textContent = "Loading records...";
+
+    try {
+        const response = await fetch("../backend/" + endpoint, {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.status === 401) {
+            message.textContent =
+                "Session expired. Please log in again.";
+            return;
+        }
+
+        if (response.status === 403) {
+            message.textContent =
+                "Access not permitted for Administrator.";
+            return;
+        }
+
+        if (!response.ok || result.success === false) {
+            message.textContent =
+                result.message || "Unable to load records.";
+            return;
+        }
+
+        const records = Array.isArray(result.data)
+            ? result.data
+            : [];
+
+        if (records.length === 0) {
+            message.textContent = "No records found.";
+            return;
+        }
+
+        message.textContent =
+            records.length + " record(s) found.";
+
+        records.forEach(record => {
+            const row = document.createElement("tr");
+
+            fields.forEach(field => {
+                const cell = document.createElement("td");
+                cell.textContent = record[field] ?? "-";
+                row.appendChild(cell);
+            });
+
+            table.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error(error);
+        message.textContent =
+            "Failed to load records. Check API connection.";
+    }
+}
+
+async function loadSystemRecords() {
+    await Promise.all([
+        loadRecordTable(
+            "events.php",
+            "eventsRecords",
+            "eventsMessage",
+            [
+                "event_id",
+                "title",
+                "venue_name",
+                "event_date",
+                "available_tickets",
+                "status"
+            ]
+        ),
+
+        loadRecordTable(
+            "venues.php",
+            "venuesRecords",
+            "venuesMessage",
+            [
+                "venue_id",
+                "venue_name",
+                "location",
+                "capacity",
+                "status"
+            ]
+        ),
+
+        loadRecordTable(
+            "bookings.php",
+            "bookingsRecords",
+            "bookingsMessage",
+            [
+                "booking_id",
+                "user_id",
+                "event_id",
+                "quantity",
+                "total_price",
+                "booking_status"
+            ]
+        )
+    ]);
+}
+
 // LOGOUT
-// ===============================
-
 function logout() {
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     window.location.href = "login.html";
 }
-
 </script>
 
 </body>

@@ -28,7 +28,7 @@ function sendBookingJson($statusCode, $body)
 
 
 function sendSendGridEmail($toEmail, $subject, $htmlContent) {
-   $apiKey = getenv('SENDGRID_API_KEY');
+   $apiKey = getenv('SENDGRID_API_KEY') ?: ($_SERVER['SENDGRID_API_KEY'] ?? '');
     if (!$apiKey && isset($_SERVER['SENDGRID_API_KEY'])) {
         $apiKey = $_SERVER['SENDGRID_API_KEY'];
     }
