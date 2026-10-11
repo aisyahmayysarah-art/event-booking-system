@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Management - Event Booking System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="navbar">
+    <div>
+        <strong>Event Booking System</strong>
+        <span> | User Management</span>
+    </div>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+    <!-- USER INFORMATION -->
+    <div class="card">
+        <h2>Welcome, <span id="adminName"></span></h2>
+        <p>Role: <strong id="adminRole"></strong></p>
+    </div>
+
+
+    <!-- ADD / EDIT USER -->
+    <div class="card">
+
+        <h2 id="formTitle">Add New User</h2>
+
+        <input type="hidden" id="userId">
+
+        <label>Name</label>
+        <input type="text" id="name" placeholder="Enter name">
+
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter email">
+
+        <div id="passwordSection">
+            <label>Password</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+            >
+        </div>
+
+        <label>Role</label>
+
+        <select id="role">
+            <option value="Administrator">Administrator</option>
+            <option value="Organiser">Organiser</option>
+            <option value="Staff">Staff</option>
+            <option value="Customer" selected>Customer</option>
+        </select>
+
+        <button
+            class="add-btn"
+            id="saveButton"
+            onclick="saveUser()"
+        >
+            Add User
+        </button>
+
+        <button
+            id="cancelButton"
+            onclick="cancelEdit()"
+            style="display:none;"
+        >
+            Cancel
+        </button>
+
+        <p id="message"></p>
+
+    </div>
+
+
+    <!-- USER LIST -->
+    <div class="card">
+
+        <h2>User List</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTable"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API_URL = "../backend/users.php";
+
+const token = localStorage.getItem("token");
+const currentUser =
+    JSON.parse(localStorage.getItem("user"));
+
+
+// ===============================
+// CHECK LOGIN
+// ===============================
+
+if (!token || !currentUser) {
+
+    window.location.href = "login.html";
+
+} else if (currentUser.role !== "Administrator") {
+
+    localStorage.clear();
+    window.location.href = "login.html";
+
+} else {
+
+    document.getElementById("adminName").innerText =
+        currentUser.name;
+
+    document.getElementById("adminRole").innerText =
+        currentUser.role;
+
+    loadUsers();
+}
+
+
+// ===============================
+// GET USERS
+// ===============================
+
+async function loadUsers() {
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "GET",
+
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401 ||
+            response.status === 403) {
+
+            localStorage.clear();
+            window.location.href = "login.html";
+            return;
+        }
+
+        const table =
+            document.getElementById("userTable");
+
+        table.innerHTML = "";
+
+        // Support both API response formats
+        const users = data.data;
+
+        if (!users || !Array.isArray(users)) {
+
+            console.log("API Response:", data);
+
+            document.getElementById("message").className =
+                "error";
+
+            document.getElementById("message").innerText =
+                "Unable to display user list.";
+
+            return;
+        }
+
+        users.forEach(user => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${user.user_id}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+
+                <td>
+                    <button
+                        class="edit-btn"
+                        onclick='editUser(${JSON.stringify(user)})'>
+                        Edit
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteUser(${user.user_id})">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            table.appendChild(row);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("message").className =
+            "error";
+
+        document.getElementById("message").innerText =
+            "Failed to load users.";
+    }
+}
+
+// ===============================
+// ADD OR UPDATE USER
+// ===============================
+
+async function saveUser() {
+
+    const userId =
+        document.getElementById("userId").value;
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const role =
+        document.getElementById("role").value;
+
+    const message =
+        document.getElementById("message");
+
+
+    message.className = "";
+    message.innerText = "";
+
+
+    if (name === "" || email === "") {
+
+        message.className = "error";
+        message.innerText =
+            "Name and email are required.";
+
+        return;
+    }
+
+
+    // ADD USER
+    if (userId === "") {
+
+        if (password === "") {
+
+            message.className = "error";
+            message.innerText =
+                "Password is required.";
+
+            return;
+        }
+
+
+        const response = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+
+            body: JSON.stringify({
+                name,
+                email,
+                password,
+                role
+            })
+
+        });
+
+
+        const data = await response.json();
+
+
+        if (response.ok) {
+
+            message.className = "success";
+            message.innerText =
+                "User added successfully.";
+
+            clearForm();
+            loadUsers();
+
+        } else {
+
+            message.className = "error";
+            message.innerText = data.message;
+        }
+
+    }
+
+    // UPDATE USER
+    else {
+
+        const response = await fetch(
+            API_URL + "?id=" + userId,
+            {
+
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":
+                        "Bearer " + token
+                },
+
+                body: JSON.stringify({
+                    name,
+                    email,
+                    role
+                })
+
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (response.ok) {
+
+            message.className = "success";
+            message.innerText =
+                "User updated successfully.";
+
+            clearForm();
+            loadUsers();
+
+        } else {
+
+            message.className = "error";
+            message.innerText = data.message;
+        }
+    }
+}
+
+
+// ===============================
+// EDIT USER
+// ===============================
+
+function editUser(user) {
+
+    document.getElementById("userId").value =
+        user.user_id;
+
+    document.getElementById("name").value =
+        user.name;
+
+    document.getElementById("email").value =
+        user.email;
+
+    document.getElementById("role").value =
+        user.role;
+
+
+    document.getElementById(
+        "passwordSection"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "formTitle"
+    ).innerText = "Edit User";
+
+
+    document.getElementById(
+        "saveButton"
+    ).innerText = "Update User";
+
+
+    document.getElementById(
+        "cancelButton"
+    ).style.display = "inline-block";
+}
+
+
+// ===============================
+// DELETE USER
+// ===============================
+
+async function deleteUser(id) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this user?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
+    const response = await fetch(
+        API_URL + "?id=" + id,
+        {
+
+            method: "DELETE",
+
+            headers: {
+                "Authorization":
+                    "Bearer " + token
+            }
+
+        }
+    );
+
+
+    const data = await response.json();
+
+
+    if (response.ok) {
+
+        alert("User deleted successfully.");
+
+        loadUsers();
+
+    } else {
+
+        alert(data.message);
+    }
+}
+
+
+// ===============================
+// CANCEL EDIT
+// ===============================
+
+function cancelEdit() {
+
+    clearForm();
+
+    document.getElementById(
+        "message"
+    ).innerText = "";
+}
+
+
+// ===============================
+// CLEAR FORM
+// ===============================
+
+function clearForm() {
+
+    document.getElementById("userId").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("role").value = "Customer";
+
+    document.getElementById(
+        "passwordSection"
+    ).style.display = "block";
+
+    document.getElementById(
+        "formTitle"
+    ).innerText = "Add New User";
+
+    document.getElementById(
+        "saveButton"
+    ).innerText = "Add User";
+
+    document.getElementById(
+        "cancelButton"
+    ).style.display = "none";
+}
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+function logout() {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

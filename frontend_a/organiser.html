@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management - Event Booking System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f5f9; color: #222; }
+        header { background: #222; color: white; padding: 16px 25px; display: flex; justify-content: space-between; align-items: center; }
+        header button { background: white; color: #222; border: none; padding: 9px 16px; cursor: pointer; border-radius: 4px; }
+        main { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
+        .panel { background: white; padding: 22px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px #0000000a; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input, textarea, select { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        textarea { min-height: 75px; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; background: #333; color: white; cursor: pointer; }
+        button:hover { opacity: .85; }
+        .secondary { background: #777; }
+        .danger { background: #c0392b; }
+        .actions { display: flex; gap: 8px; margin-top: 16px; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid #ddd; padding: 11px; text-align: left; font-size: 13px; }
+        th { background: #f4f4f4; }
+        .row-actions { display: flex; gap: 6px; }
+        .message { margin-top: 12px; font-size: 14px; }
+        .error { color: #b42318; }
+        .success { color: #137333; }
+        @media (max-width: 650px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>Event Booking System | Event Management</strong>
+    <button onclick="logout()">Logout</button>
+</header>
+
+<main>
+    <section class="panel">
+        <h2 id="welcome">Welcome</h2>
+        <p id="roleText"></p>
+    </section>
+
+    <section class="panel">
+        <h2 id="formTitle">Add New Event</h2>
+
+        <form id="eventForm">
+            <div class="form-grid">
+                <div>
+                    <label for="title">Event Title</label>
+                    <input id="title" required minlength="3" maxlength="150">
+                </div>
+
+                <div>
+                    <label for="venue_id">Venue ID</label>
+                    <input id="venue_id" type="number" min="1" required>
+                </div>
+
+                <div>
+                    <label for="event_date">Event Date and Time</label>
+                    <input id="event_date" type="datetime-local" required>
+                </div>
+
+                <div>
+                    <label for="ticket_price">Ticket Price (RM)</label>
+                    <input id="ticket_price" type="number" min="0" step="0.01" required>
+                </div>
+
+                <div>
+                    <label for="total_tickets">Total Tickets</label>
+                    <input id="total_tickets" type="number" min="1" required>
+                </div>
+
+                <div>
+                    <label for="status">Event Status</label>
+                    <select id="status">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top:14px">
+                <label for="description">Description</label>
+                <textarea id="description"></textarea>
+            </div>
+
+            <div class="actions">
+                <button type="submit" id="saveBtn">Add Event</button>
+                <button type="button" class="secondary" onclick="resetForm()">Cancel / Clear</button>
+            </div>
+            <p id="formMessage" class="message" aria-live="polite"></p>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Event List</h2>
+        <div class="actions">
+            <input id="searchInput" placeholder="Search events by title or description">
+            <button onclick="loadEvents()">Search</button>
+            <button class="secondary" onclick="clearSearch()">Clear</button>
+        </div>
+
+        <p id="listMessage" class="message" aria-live="polite"></p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Available / Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="eventRows"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+const API = "../backend/events.php";
+const token = localStorage.getItem("token");
+let currentUser = null;
+let events = [];
+let editingId = null;
+
+try {
+    currentUser = JSON.parse(localStorage.getItem("user") || "null");
+} catch {
+    currentUser = null;
+}
+
+if (!token || !currentUser) {
+    window.location.replace("login.html");
+} else if (!["Administrator", "Organiser", "Staff"].includes(currentUser.role)) {
+    alert("Access denied. Event Management is not available for your role.");
+    window.location.replace("login.html");
+} else {
+    document.getElementById("welcome").textContent =
+        "Welcome, " + (currentUser.name || "User");
+    document.getElementById("roleText").textContent =
+        "Role: " + currentUser.role;
+    loadEvents();
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401) {
+        alert("Session expired. Please login again.");
+        logout();
+        throw new Error("Session expired");
+    }
+
+    if (!response.ok || data.success === false) {
+        const details = Array.isArray(data.errors)
+            ? " " + data.errors.map(e => e.message).join("; ")
+            : "";
+        throw new Error((data.message || "Request failed") + details);
+    }
+
+    return data;
+}
+
+function showMessage(id, message, success = false) {
+    const element = document.getElementById(id);
+    element.textContent = message;
+    element.className = "message " + (success ? "success" : "error");
+}
+
+async function loadEvents() {
+    const search = document.getElementById("searchInput").value.trim();
+    const url = API + "?limit=100" +
+        (search ? "&search=" + encodeURIComponent(search) : "");
+
+    try {
+        const result = await apiRequest(url);
+        events = result.data || [];
+        renderEvents();
+        showMessage(
+            "listMessage",
+            events.length ? events.length + " event(s) loaded." : "No events found.",
+            true
+        );
+    } catch (error) {
+        showMessage("listMessage", error.message);
+    }
+}
+
+function renderEvents() {
+    const tbody = document.getElementById("eventRows");
+    tbody.replaceChildren();
+
+    events.forEach(event => {
+        const tr = document.createElement("tr");
+        const values = [
+            event.event_id,
+            event.title,
+            event.venue_name || event.venue_id,
+            event.event_date,
+            "RM " + Number(event.ticket_price).toFixed(2),
+            event.available_tickets + " / " + event.total_tickets,
+            event.status
+        ];
+
+        values.forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value ?? "";
+            tr.appendChild(td);
+        });
+
+        const actions = document.createElement("td");
+        actions.className = "row-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.onclick = () => editEvent(event.event_id);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "danger";
+        deleteBtn.onclick = () => deleteEvent(event.event_id);
+
+        // Only Administrators or the event organiser can modify an event.
+        const canModify = currentUser.role === "Administrator" ||
+            Number(event.organiser_id) === Number(currentUser.user_id);
+
+        if (canModify) {
+            actions.append(editBtn, deleteBtn);
+        } else {
+            actions.textContent = "View only";
+        }
+
+        tr.appendChild(actions);
+        tbody.appendChild(tr);
+    });
+}
+
+function editEvent(id) {
+    const event = events.find(e => Number(e.event_id) === Number(id));
+    if (!event) return;
+
+    editingId = id;
+    document.getElementById("title").value = event.title;
+    document.getElementById("description").value = event.description || "";
+    document.getElementById("venue_id").value = event.venue_id;
+    document.getElementById("event_date").value =
+        String(event.event_date).replace(" ", "T").slice(0, 16);
+    document.getElementById("ticket_price").value = event.ticket_price;
+    document.getElementById("total_tickets").value = event.total_tickets;
+    document.getElementById("status").value = event.status;
+
+    document.getElementById("formTitle").textContent = "Edit Event #" + id;
+    document.getElementById("saveBtn").textContent = "Update Event";
+    document.getElementById("eventForm").scrollIntoView({ behavior: "smooth" });
+}
+
+function resetForm() {
+    editingId = null;
+    document.getElementById("eventForm").reset();
+    document.getElementById("formTitle").textContent = "Add New Event";
+    document.getElementById("saveBtn").textContent = "Add Event";
+    document.getElementById("formMessage").textContent = "";
+}
+
+document.getElementById("eventForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const payload = {
+        title: document.getElementById("title").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        venue_id: Number(document.getElementById("venue_id").value),
+        event_date: document.getElementById("event_date").value
+            .replace("T", " ") + ":00",
+        ticket_price: Number(document.getElementById("ticket_price").value),
+        total_tickets: Number(document.getElementById("total_tickets").value),
+        status: document.getElementById("status").value
+    };
+
+    const isEditing = editingId !== null;
+
+    try {
+        const result = await apiRequest(
+            isEditing ? API + "?id=" + editingId : API,
+            {
+                method: isEditing ? "PUT" : "POST",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        resetForm();
+        showMessage("formMessage", result.message || "Event saved.", true);
+        await loadEvents();
+    } catch (error) {
+        showMessage("formMessage", error.message);
+    }
+});
+
+async function deleteEvent(id) {
+    if (!confirm("Are you sure you want to delete Event #" + id + "?")) return;
+
+    try {
+        const result = await apiRequest(API + "?id=" + id, {
+            method: "DELETE"
+        });
+        showMessage("listMessage", result.message || "Event deleted.", true);
+        await loadEvents();
+    } catch (error) {
+        showMessage("listMessage", error.message);
+    }
+}
+
+function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    loadEvents();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - Event Booking System</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #222;
+        }
+        header {
+            background: #222;
+            color: white;
+            padding: 16px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        main {
+            max-width: 1050px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+        .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px #0000000a;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+        .event-card {
+            border: 1px solid #ddd;
+            padding: 17px;
+            border-radius: 7px;
+        }
+        .event-card h3 { margin-top: 0; }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { opacity: .85; }
+        .danger { background: #c0392b; }
+        .secondary { background: #777; }
+        .success { color: #137333; }
+        .error { color: #b42318; }
+        .message { margin: 12px 0; font-size: 14px; }
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            font-size: 13px;
+        }
+        th { background: #f4f4f4; }
+        @media (max-width: 600px) {
+            .search-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>Event Booking System | Customer Dashboard</strong>
+    <button onclick="logout()" style="background:white;color:#222">
+        Logout
+    </button>
+</header>
+
+<main>
+    <section class="panel">
+        <h2 id="welcome">Welcome</h2>
+        <p id="roleText"></p>
+    </section>
+
+    <section class="panel">
+        <h2>Available Events</h2>
+        <div class="search-row">
+            <input id="searchInput" placeholder="Search events">
+            <button onclick="loadEvents()">Search</button>
+            <button class="secondary" onclick="clearSearch()">Clear</button>
+        </div>
+
+        <p id="eventMessage" class="message" aria-live="polite"></p>
+        <div id="eventCards" class="grid"></div>
+    </section>
+
+    <section class="panel">
+        <h2>My Bookings</h2>
+        <button onclick="loadBookings()">Refresh Bookings</button>
+        <p id="bookingMessage" class="message" aria-live="polite"></p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Event</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingRows"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+const EVENTS_API = "../backend/events.php";
+const BOOKINGS_API = "../backend/bookings.php";
+
+const token = localStorage.getItem("token");
+let currentUser = null;
+
+try {
+    currentUser = JSON.parse(localStorage.getItem("user") || "null");
+} catch {
+    currentUser = null;
+}
+
+if (!token || !currentUser) {
+    window.location.replace("login.html");
+} else if (currentUser.role !== "Customer") {
+    alert("Access denied. Customer account required.");
+    window.location.replace("login.html");
+} else {
+    document.getElementById("welcome").textContent =
+        "Welcome, " + (currentUser.name || "Customer");
+    document.getElementById("roleText").textContent =
+        "Role: " + currentUser.role;
+
+    loadEvents();
+    loadBookings();
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+
+    const raw = await response.text();
+    let data;
+
+    try {
+        data = JSON.parse(raw);
+    } catch {
+        throw new Error(
+            "Backend did not return valid JSON. Check the PHP API."
+        );
+    }
+
+    if (response.status === 401) {
+        alert("Session expired. Please login again.");
+        logout();
+        throw new Error("Session expired");
+    }
+
+    if (!response.ok || data.success === false) {
+        throw new Error(data.message || "Request failed");
+    }
+
+    return data;
+}
+
+function showMessage(id, message, success = false) {
+    const element = document.getElementById(id);
+    element.textContent = message;
+    element.className = "message " + (success ? "success" : "error");
+}
+
+async function loadEvents() {
+    const search = document.getElementById("searchInput").value.trim();
+    const url = EVENTS_API + "?limit=100" +
+        (search ? "&search=" + encodeURIComponent(search) : "");
+
+    try {
+        const result = await apiRequest(url);
+        const events = (result.data || []).filter(
+            event => event.status === "published"
+        );
+
+        const container = document.getElementById("eventCards");
+        container.replaceChildren();
+
+        if (events.length === 0) {
+            showMessage("eventMessage", "No published events found.", true);
+            return;
+        }
+
+        events.forEach(event => {
+            const card = document.createElement("div");
+            card.className = "event-card";
+
+            const title = document.createElement("h3");
+            title.textContent = event.title;
+
+            const details = document.createElement("p");
+            details.textContent =
+                "Venue: " + (event.venue_name || event.venue_id) +
+                "\nDate: " + event.event_date +
+                "\nPrice: RM " + Number(event.ticket_price).toFixed(2) +
+                "\nAvailable Tickets: " + event.available_tickets;
+            details.style.whiteSpace = "pre-line";
+
+            const quantity = document.createElement("input");
+            quantity.type = "number";
+            quantity.min = "1";
+            quantity.max = String(event.available_tickets);
+            quantity.value = "1";
+            quantity.setAttribute("aria-label", "Ticket quantity");
+
+            const button = document.createElement("button");
+            button.textContent = "Book Now";
+            button.style.marginTop = "10px";
+            button.disabled = Number(event.available_tickets) <= 0;
+
+            button.onclick = () => createBooking(
+                event.event_id,
+                Number(quantity.value)
+            );
+
+            card.append(title, details, quantity, button);
+            container.appendChild(card);
+        });
+
+        showMessage(
+            "eventMessage",
+            events.length + " published event(s) found.",
+            true
+        );
+    } catch (error) {
+        showMessage("eventMessage", error.message);
+    }
+}
+
+async function createBooking(eventId, quantity) {
+    if (!Number.isInteger(quantity) || quantity < 1) {
+        showMessage("eventMessage", "Enter a valid ticket quantity.");
+        return;
+    }
+
+    if (!confirm("Confirm booking for " + quantity + " ticket(s)?")) {
+        return;
+    }
+
+    try {
+        const result = await apiRequest(BOOKINGS_API, {
+            method: "POST",
+            body: JSON.stringify({
+                event_id: Number(eventId),
+                quantity: quantity
+            })
+        });
+
+        showMessage(
+            "eventMessage",
+            result.message || "Booking created successfully.",
+            true
+        );
+
+        await loadEvents();
+        await loadBookings();
+    } catch (error) {
+        showMessage("eventMessage", error.message);
+    }
+}
+
+async function loadBookings() {
+    try {
+        const result = await apiRequest(BOOKINGS_API);
+        const bookings = result.data || [];
+        const tbody = document.getElementById("bookingRows");
+        tbody.replaceChildren();
+
+        bookings.forEach(booking => {
+            const tr = document.createElement("tr");
+
+            
+        const values = [
+            booking.booking_id,
+            booking.event_name || booking.event_title || booking.title || booking.event_id,
+            booking.quantity,
+            "RM " + Number(booking.total_price).toFixed(2),
+            booking.booking_status || booking.status
+        ];
+
+
+            values.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value ?? "";
+                tr.appendChild(td);
+            });
+
+            const actionCell = document.createElement("td");
+            const status = String(
+                booking.booking_status || booking.status || ""
+            ).toLowerCase();
+
+            if (status !== "cancelled") {
+                const cancelBtn = document.createElement("button");
+                cancelBtn.className = "danger";
+                cancelBtn.textContent = "Cancel Booking";
+                cancelBtn.onclick = () => cancelBooking(booking.booking_id);
+                actionCell.appendChild(cancelBtn);
+            } else {
+                actionCell.textContent = "Cancelled";
+            }
+
+            tr.appendChild(actionCell);
+            tbody.appendChild(tr);
+        });
+
+        showMessage(
+            "bookingMessage",
+            bookings.length
+                ? bookings.length + " booking(s) loaded."
+                : "No bookings found.",
+            true
+        );
+    } catch (error) {
+        showMessage("bookingMessage", error.message);
+    }
+}
+
+
+async function cancelBooking(bookingId) {
+    if (!confirm("Are you sure you want to cancel this booking?")) {
+        return;
+    }
+
+    try {
+        const result = await apiRequest(BOOKINGS_API, {
+            method: "PUT",
+            body: JSON.stringify({
+                booking_id: Number(bookingId),
+                booking_status: "Cancelled"
+            })
+        });
+
+        await loadBookings();
+        await loadEvents();
+
+        showMessage(
+            "bookingMessage",
+            result.message || "Booking cancelled successfully.",
+            true
+        );
+
+    } catch (error) {
+        showMessage("bookingMessage", error.message);
+    }
+}
+
+
+
+function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    loadEvents();
+}
+</script>
+
+</body>
+</html>
