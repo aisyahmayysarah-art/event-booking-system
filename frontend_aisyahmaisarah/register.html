@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - Event Booking System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #6E8AAF;
+        }
+
+        /* =========================================
+           MAIN REGISTER PAGE
+        ========================================= */
+
+        .register-page {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 40px 70px;
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 1050px;
+
+            display: grid;
+            grid-template-columns: 1fr 430px;
+
+            gap: 90px;
+            align-items: center;
+        }
+
+        /* =========================================
+           LEFT SIDE
+        ========================================= */
+
+        .register-info {
+            color: white;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 58px;
+            height: 58px;
+
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .brand-text h1 {
+            font-size: 31px;
+            letter-spacing: 1px;
+        }
+
+        .brand-text p {
+            margin-top: 3px;
+
+            font-size: 13px;
+            letter-spacing: 3px;
+
+            opacity: 0.85;
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 430px;
+
+            height: 1px;
+
+            background: rgba(255, 255, 255, 0.18);
+
+            margin-bottom: 25px;
+        }
+
+        .register-info h2 {
+            max-width: 470px;
+
+            font-size: 36px;
+            line-height: 1.2;
+
+            margin-bottom: 18px;
+        }
+
+        .register-info .description {
+            max-width: 460px;
+
+            font-size: 16px;
+            line-height: 1.7;
+
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .dots {
+            display: flex;
+            gap: 5px;
+
+            margin-top: 40px;
+        }
+
+        .dots span {
+            width: 6px;
+            height: 6px;
+
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* =========================================
+           REGISTER CARD
+        ========================================= */
+
+        .register-container {
+            width: 100%;
+
+            background: white;
+
+            padding: 35px 40px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.18);
+        }
+
+        .register-container h1 {
+            color: #181818;
+
+            font-size: 29px;
+
+            margin-bottom: 8px;
+        }
+
+        .register-subtitle {
+            color: #666;
+
+            font-size: 14px;
+
+            margin-bottom: 24px;
+        }
+
+        /* =========================================
+           FORM
+        ========================================= */
+
+        label {
+            display: block;
+
+            color: #333;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            margin-bottom: 16px;
+
+            border: 1px solid #d7d7d7;
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            background: white;
+
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+
+            border-color: #1677f2;
+
+            box-shadow:
+                0 0 0 3px rgba(22, 119, 242, 0.10);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        /* =========================================
+           REGISTER BUTTON
+        ========================================= */
+
+        .register-btn {
+            width: 100%;
+
+            border: none;
+            border-radius: 7px;
+
+            padding: 14px;
+
+            margin-top: 3px;
+
+            background: #6DB08D;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .register-btn:hover {
+            background: #1DB4C2;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px rgba(22, 119, 242, 0.25);
+        }
+
+        /* =========================================
+           MESSAGE
+        ========================================= */
+
+        .message {
+            margin-top: 15px;
+
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .message.error {
+            color: #d63031;
+        }
+
+        .message.success {
+            color: #00a878;
+        }
+
+        /* =========================================
+           LOGIN LINK
+        ========================================= */
+
+        .login-link {
+            text-align: center;
+
+            margin-top: 20px;
+
+            font-size: 14px;
+
+            color: #555;
+        }
+
+        .login-link a {
+            color: #1DB4C2;
+
+            font-weight: bold;
+
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 900px) {
+
+            .register-page {
+                padding: 40px 25px;
+            }
+
+            .register-wrapper {
+                grid-template-columns: 1fr;
+
+                max-width: 500px;
+
+                gap: 35px;
+            }
+
+            .register-info {
+                text-align: center;
+            }
+
+            .brand {
+                justify-content: center;
+            }
+
+            .divider {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .register-info h2,
+            .register-info .description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .dots {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 520px) {
+
+            .register-page {
+                padding: 25px 15px;
+            }
+
+            .register-info h2 {
+                font-size: 28px;
+            }
+
+            .brand-text h1 {
+                font-size: 25px;
+            }
+
+            .register-container {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="register-page">
+
+    <div class="register-wrapper">
+
+        <!-- LEFT SIDE -->
+        <div class="register-info">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    E
+                </div>
+
+                <div class="brand-text">
+                    <h1>EVENT BOOKING</h1>
+                    <p>BOOK • ENJOY • EXPERIENCE</p>
+                </div>
+
+            </div>
+
+            <div class="divider"></div>
+
+            <h2>
+                Create your account.<br>
+                Start booking events.
+            </h2>
+
+            <p class="description">
+                Register as a customer to explore available events,
+                make bookings and manage your booking records.
+            </p>
+
+            <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE REGISTER -->
+        <div class="register-container">
+
+            <h1>Create account</h1>
+
+            <p class="register-subtitle">
+                Enter your information to register.
+            </p>
+
+
+            <label for="name">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your full name"
+                autocomplete="name"
+            >
+
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+            >
+
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                autocomplete="new-password"
+            >
+
+
+            <label for="confirmPassword">
+                Confirm Password
+            </label>
+
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                autocomplete="new-password"
+            >
+
+
+            <button
+                class="register-btn"
+                id="registerBtn"
+                onclick="registerUser()"
+            >
+                Register
+            </button>
+
+
+            <p
+                id="message"
+                class="message"
+            ></p>
+
+
+            <p class="login-link">
+                Already have an account?
+                <a href="login.html">
+                    Login here
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function registerUser() {
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+    const message =
+        document.getElementById("message");
+
+    const registerBtn =
+        document.getElementById("registerBtn");
+
+
+    message.textContent = "";
+    message.className = "message";
+
+
+    /* CHECK EMPTY FIELDS */
+
+    if (
+        name === "" ||
+        email === "" ||
+        password === "" ||
+        confirmPassword === ""
+    ) {
+
+        message.textContent =
+            "Please complete all fields.";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    /* CHECK PASSWORD LENGTH */
+
+    if (password.length < 6) {
+
+        message.textContent =
+            "Password must contain at least 6 characters.";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    /* CHECK PASSWORD MATCH */
+
+    if (password !== confirmPassword) {
+
+        message.textContent =
+            "Passwords do not match.";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    registerBtn.disabled = true;
+
+    registerBtn.textContent =
+        "Registering...";
+
+
+    try {
+
+        const response = await fetch(
+            "../backend/register.php",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: password
+                })
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            response.ok &&
+            data.success
+        ) {
+
+            message.textContent =
+                data.message ||
+                "Registration successful. You can now log in.";
+
+            message.className =
+                "message success";
+
+
+            /* CLEAR FORM */
+
+            document.getElementById(
+                "name"
+            ).value = "";
+
+            document.getElementById(
+                "email"
+            ).value = "";
+
+            document.getElementById(
+                "password"
+            ).value = "";
+
+            document.getElementById(
+                "confirmPassword"
+            ).value = "";
+
+
+            /* REDIRECT TO LOGIN */
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        "login.html";
+
+                },
+                1500
+            );
+
+
+        } else {
+
+            message.textContent =
+                data.message ||
+                "Registration failed.";
+
+            message.className =
+                "message error";
+        }
+
+
+    } catch (error) {
+
+        message.textContent =
+            "Unable to connect to server.";
+
+        message.className =
+            "message error";
+
+    } finally {
+
+        registerBtn.disabled = false;
+
+        registerBtn.textContent =
+            "Register";
+    }
+}
+
+
+/* ENTER KEY */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            registerUser();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

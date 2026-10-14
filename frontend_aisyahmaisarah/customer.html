@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Dashboard - Event Booking System</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .customer-navbar {
+            width: 100%;
+            background: #6E8AAF;
+            color: white;
+            padding: 16px 45px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .brand p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            opacity: 0.85;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .logout-btn {
+            background: white;
+            color: #123361;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #eef5ff;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .page-container {
+            width: 90%;
+            max-width: 1180px;
+            margin: 35px auto;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2,
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           DASHBOARD
+        ========================= */
+
+        .welcome-card {
+            background: linear-gradient(135deg, #081630, #C1DADE);
+            color: white;
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(25, 118, 243, 0.2);
+        }
+
+        .welcome-card h1 {
+            margin: 0 0 10px;
+        }
+
+        .welcome-card p {
+            margin: 5px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2A4A91;
+            margin: 8px 0;
+        }
+
+        .stat-card p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        /* =========================
+           SEARCH BAR
+        ========================= */
+
+        .event-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 22px;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 46px;
+            padding: 0 45px 0 42px;
+            border: 1px solid #d7deea;
+            border-radius: 10px;
+            background: #f8faff;
+            font-size: 14px;
+            margin: 0;
+            transition: 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1976f3;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(25, 118, 243, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 19px;
+            pointer-events: none;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            width: 30px;
+            height: 30px;
+
+            border: none;
+            border-radius: 50%;
+            padding: 0;
+
+            background: transparent;
+            color: #64748b;
+
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .clear-search-btn:hover {
+            background: #e8eef7;
+        }
+
+        .search-result-text {
+            margin: 12px 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 35px !important;
+            color: #6b7280;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #edf3fb;
+            padding: 14px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .primary-btn {
+            background: #126161;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .primary-btn:hover {
+            background: #0f65d8;
+        }
+
+        .danger-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .danger-btn:hover {
+            background: #bd2634;
+        }
+
+        .danger-btn:disabled {
+            background: #c9c9c9;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .booking-form {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1976f3;
+            box-shadow: 0 0 0 3px rgba(25, 118, 243, 0.1);
+        }
+
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #16803c;
+        }
+
+        .error-message {
+            color: #d93025;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-confirmed {
+            background: #dff6e7;
+            color: #137333;
+        }
+
+        .status-pending {
+            background: #fff2cc;
+            color: #8a6100;
+        }
+
+        .status-cancelled {
+            background: #fde2e2;
+            color: #b3261e;
+        }
+
+        .status-published {
+            background: #dcecff;
+            color: #0b57d0;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 850px) {
+
+            .customer-navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .page-container {
+                width: 95%;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .event-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<!-- =========================================
+     NAVBAR
+========================================= -->
+
+<header class="customer-navbar">
+
+    <div class="brand">
+        <h2>EVENT BOOKING</h2>
+        <p>CUSTOMER PANEL</p>
+    </div>
+
+    <nav class="nav-menu">
+
+        <button
+            class="nav-btn active"
+            onclick="showSection('dashboard', this)"
+        >
+            Dashboard Customer
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('events', this)"
+        >
+            Browse Events
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('bookings', this)"
+        >
+            My Bookings
+        </button>
+
+    </nav>
+
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        Logout
+    </button>
+
+</header>
+
+
+<main class="page-container">
+
+    <!-- =====================================
+         DASHBOARD
+    ====================================== -->
+
+    <section
+        id="dashboard"
+        class="page-section active"
+    >
+
+        <div class="welcome-card">
+
+            <h1 id="welcomeCustomer">
+                Welcome!
+            </h1>
+
+            <p>
+                Welcome to the Event Booking System.
+            </p>
+
+            <p id="customerEmail"></p>
+
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat-card">
+
+                <h3>Available Events</h3>
+
+                <div
+                    class="number"
+                    id="eventCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Events available for browsing.
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>My Bookings</h3>
+
+                <div
+                    class="number"
+                    id="bookingCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Your booking records.
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>Confirmed</h3>
+
+                <div
+                    class="number"
+                    id="confirmedCount"
+                >
+                    0
+                </div>
+
+                <p>
+                    Confirmed bookings.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         BROWSE EVENTS
+    ====================================== -->
+
+    <section
+        id="events"
+        class="page-section"
+    >
+
+        <div class="card">
+
+            <h2>Browse Events</h2>
+
+            <p class="subtitle">
+                Browse available events and select an event to make a booking.
+            </p>
+
+
+            <!-- SEARCH + REFRESH -->
+
+            <div class="event-toolbar">
+
+                <div class="search-box">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="eventSearch"
+                        placeholder="Search event, venue, date or status..."
+                        oninput="searchEvents()"
+                    >
+
+                    <button
+                        type="button"
+                        class="clear-search-btn"
+                        onclick="clearEventSearch()"
+                        title="Clear search"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    onclick="loadEvents()"
+                >
+                    Refresh Events
+                </button>
+
+            </div>
+
+
+            <p
+                id="searchResultText"
+                class="search-result-text"
+            ></p>
+
+
+            <!-- EVENT TABLE -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Event</th>
+                            <th>Venue</th>
+                            <th>Date</th>
+                            <th>Ticket Price (RM)</th>
+                            <th>Available Tickets</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="eventRows"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+     BOOK EVENT
+====================================== -->
+
+<div
+    class="card"
+    id="bookingFormCard"
+>
+
+    <h2>Book Event</h2>
+
+    <p class="subtitle">
+        Select an event and enter the number of tickets required.
+    </p>
+
+    <form
+        id="bookingForm"
+        class="booking-form"
+    >
+
+        <!-- EVENT -->
+        <div class="form-group">
+
+            <label for="eventSelect">
+                Event
+            </label>
+
+            <select
+                id="eventSelect"
+                onchange="updateBookingPrice()"
+                required
+            >
+                <option value="">
+                    Select Event
+                </option>
+            </select>
+
+        </div>
+
+
+        <!-- TICKET QUANTITY -->
+        <div class="form-group">
+
+            <label for="quantity">
+                Ticket Quantity
+            </label>
+
+            <input
+                    type="number"
+                    id="quantity"
+                    min="1"
+                    max="10"
+                    value="1"
+                    oninput="updateBookingPrice()"
+                    required
+                >
+
+        </div>
+
+
+        <!-- TICKET PRICE -->
+        <div class="form-group">
+
+            <label for="ticketPriceDisplay">
+                Ticket Price (RM)
+            </label>
+
+            <input
+                type="text"
+                id="ticketPriceDisplay"
+                value="RM 0.00"
+                readonly
+            >
+
+        </div>
+
+
+        <!-- TOTAL PRICE -->
+        <div class="form-group">
+
+            <label for="totalPriceDisplay">
+                Total Price (RM)
+            </label>
+
+            <input
+                type="text"
+                id="totalPriceDisplay"
+                value="RM 0.00"
+                readonly
+            >
+
+        </div>
+
+
+        <!-- PAYMENT METHOD -->
+        <div class="form-group">
+
+            <label for="paymentMethod">
+                Payment Method
+            </label>
+
+            <select
+                id="paymentMethod"
+                required
+            >
+                <option value="">
+                    Select Payment Method
+                </option>
+
+                <option value="Online Banking">
+                    Online Banking
+                </option>
+
+                <option value="E-Wallet">
+                    E-Wallet
+                </option>
+
+                <option value="Credit / Debit Card">
+                    Credit / Debit Card
+                </option>
+            </select>
+
+        </div>
+
+
+        <!-- CONFIRM BOOKING -->
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            Confirm Booking
+        </button>
+
+    </form>
+
+
+    <p
+        id="bookingMessage"
+        class="message"
+    ></p>
+
+</div>
+
+</section>
+
+
+    <!-- =====================================
+         MY BOOKINGS
+    ====================================== -->
+
+    <section
+        id="bookings"
+        class="page-section"
+    >
+
+        <div class="card">
+
+            <h2>My Bookings</h2>
+
+            <p class="subtitle">
+                View your booking history and current booking status.
+            </p>
+
+
+            <button
+                class="primary-btn"
+                onclick="loadBookings()"
+            >
+                Refresh Bookings
+            </button>
+
+
+            <div class="table-wrapper">
+
+                <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Event ID</th>
+            <th>Quantity</th>
+            <th>Total Price (RM)</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody id="bookingTableBody">
+    </tbody>
+</table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* =========================================
+   AUTHENTICATION
+========================================= */
+
+const token =
+    localStorage.getItem("token");
+
+let user = null;
+
+
+try {
+
+    user = JSON.parse(
+        localStorage.getItem("user") || "null"
+    );
+
+} catch (error) {
+
+    user = null;
+
+}
+
+
+/* Customer page protection */
+
+if (
+    !token ||
+    !user ||
+    user.role !== "Customer"
+) {
+
+    window.location.replace(
+        "login.html"
+    );
+
+}
+
+
+/* =========================================
+   API
+========================================= */
+
+const EVENTS_API =
+    "../backend/events.php";
+
+const BOOKINGS_API =
+    "../backend/bookings.php";
+
+
+let eventRecords = [];
+let bookingRecords = [];
+
+
+/* =========================================
+   CUSTOMER INFORMATION
+========================================= */
+
+if (user) {
+
+    document.getElementById(
+        "welcomeCustomer"
+    ).textContent =
+        "Welcome, " + user.name + "!";
+
+
+    document.getElementById(
+        "customerEmail"
+    ).textContent =
+        user.email + " | Customer";
+
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+function showSection(sectionId, button) {
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(nav => {
+            nav.classList.remove("active");
+        });
+
+    document
+        .getElementById(sectionId)
+        .classList.add("active");
+
+    if (button) {
+        button.classList.add("active");
+    }
+
+    if (sectionId === "events") {
+        loadEvents();
+    }
+
+    if (sectionId === "bookings") {
+        loadBookings();
+    }
+}
+
+
+/* =========================================
+   UPDATE BOOKING PRICE
+========================================= */
+
+function updateBookingPrice() {
+
+    const eventSelect =
+        document.getElementById("eventSelect");
+
+    const quantityInput =
+        document.getElementById("quantity");
+
+    const priceDisplay =
+        document.getElementById("ticketPriceDisplay");
+
+    const totalDisplay =
+        document.getElementById("totalPriceDisplay");
+
+
+    if (
+        !eventSelect ||
+        !quantityInput ||
+        !priceDisplay ||
+        !totalDisplay
+    ) {
+        return;
+    }
+
+
+    const eventId =
+        Number(eventSelect.value);
+
+    const quantity =
+        Math.max(
+            1,
+            Number(quantityInput.value) || 1
+        );
+
+
+    const selectedEvent =
+        eventRecords.find(event =>
+            Number(event.event_id) === eventId
+        );
+
+
+    if (!selectedEvent) {
+
+        priceDisplay.value =
+            "RM 0.00";
+
+        totalDisplay.value =
+            "RM 0.00";
+
+        return;
+    }
+
+
+    const ticketPrice =
+        Number(
+            selectedEvent.ticket_price ??
+            selectedEvent.price ??
+            0
+        );
+
+
+    const totalPrice =
+        ticketPrice * quantity;
+
+
+    priceDisplay.value =
+        "RM " + ticketPrice.toFixed(2);
+
+    totalDisplay.value =
+        "RM " + totalPrice.toFixed(2);
+}
+
+
+
+
+/* =========================================
+   API REQUEST
+========================================= */
+
+async function request(
+    method,
+    url,
+    body = null
+) {
+
+    const options = {
+
+        method: method,
+
+        headers: {
+            "Authorization":
+                "Bearer " + token
+        }
+
+    };
+
+
+    if (body !== null) {
+
+        options.headers[
+            "Content-Type"
+        ] = "application/json";
+
+        options.body =
+            JSON.stringify(body);
+
+    }
+
+
+    const response =
+        await fetch(url, options);
+
+
+    let data;
+
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        throw new Error(
+            "Invalid response from server."
+        );
+
+    }
+
+
+    if (!response.ok) {
+
+        if (response.status === 401) {
+
+            localStorage.removeItem(
+                "token"
+            );
+
+            localStorage.removeItem(
+                "user"
+            );
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return;
+
+        }
+
+
+        throw new Error(
+            data.message ||
+            "Request failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================================
+   HELPER
+========================================= */
+
+function addCell(
+    row,
+    value
+) {
+
+    const td =
+        document.createElement("td");
+
+    td.textContent =
+        value ?? "-";
+
+    row.appendChild(td);
+
+}
+
+
+function getStatus(record) {
+
+    return (
+        record.booking_status ||
+        record.status ||
+        "-"
+    );
+
+}
+
+
+/* =========================================
+   STATUS BADGE
+========================================= */
+
+function createStatus(status) {
+
+    const span =
+        document.createElement("span");
+
+    span.className = "status";
+
+
+    const value =
+        String(status || "")
+            .toLowerCase();
+
+
+    if (value === "confirmed") {
+
+        span.classList.add(
+            "status-confirmed"
+        );
+
+    } else if (value === "pending") {
+
+        span.classList.add(
+            "status-pending"
+        );
+
+    } else if (value === "cancelled") {
+
+        span.classList.add(
+            "status-cancelled"
+        );
+
+    } else if (value === "published") {
+
+        span.classList.add(
+            "status-published"
+        );
+
+    }
+
+
+    span.textContent =
+        status || "-";
+
+
+    return span;
+
+}
+
+
+/* =========================================
+   DISPLAY EVENTS
+========================================= */
+
+function displayEvents(events) {
+
+    const tbody =
+        document.getElementById(
+            "eventRows"
+        );
+
+
+    tbody.replaceChildren();
+
+
+    if (events.length === 0) {
+
+        const tr =
+            document.createElement("tr");
+
+        const td =
+            document.createElement("td");
+
+
+        td.colSpan = 8;
+
+        td.className =
+            "no-events";
+
+        td.textContent =
+            "No events found matching your search.";
+
+
+        tr.appendChild(td);
+
+        tbody.appendChild(tr);
+
+        return;
+
+    }
+
+
+    events.forEach(event => {
+
+        const tr =
+            document.createElement("tr");
+
+
+        addCell(
+            tr,
+            event.event_id
+        );
+
+
+        addCell(
+            tr,
+            event.event_name ||
+            event.name ||
+            event.title
+        );
+
+
+        addCell(
+            tr,
+            event.venue_name ||
+            event.venue ||
+            event.venue_id
+        );
+
+
+        addCell(
+            tr,
+            event.event_date ||
+            event.date ||
+            event.event_datetime
+        );
+
+
+        addCell(
+            tr,
+            event.ticket_price ||
+            event.price
+        );
+
+
+        addCell(
+            tr,
+            event.available_tickets
+        );
+
+
+        /* STATUS */
+
+        const statusTd =
+            document.createElement(
+                "td"
+            );
+
+
+        statusTd.appendChild(
+            createStatus(
+                event.status ||
+                "Published"
+            )
+        );
+
+
+        tr.appendChild(
+            statusTd
+        );
+
+
+        /* BOOK BUTTON */
+
+        const actionTd =
+            document.createElement(
+                "td"
+            );
+
+
+        const bookButton =
+            document.createElement(
+                "button"
+            );
+
+
+        bookButton.textContent =
+            "Book";
+
+        bookButton.className =
+            "primary-btn";
+
+
+        bookButton.onclick =
+            () => {
+
+                selectEvent(
+                    event.event_id
+                );
+
+            };
+
+
+        actionTd.appendChild(
+            bookButton
+        );
+
+
+        tr.appendChild(
+            actionTd
+        );
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================
+   LOAD EVENTS
+========================================= */
+
+async function loadEvents() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                EVENTS_API
+            );
+
+
+        eventRecords =
+            result.data ||
+            result.events ||
+            [];
+
+
+        /* Sort Event ID 1, 2, 3... */
+
+        eventRecords.sort(
+            (a, b) =>
+                Number(a.event_id) -
+                Number(b.event_id)
+        );
+
+
+        /* Show published events */
+
+        const visibleEvents =
+            eventRecords.filter(event => {
+
+                if (!event.status) {
+
+                    return true;
+
+                }
+
+
+                return (
+                    String(event.status)
+                        .toLowerCase()
+                    === "published"
+                );
+
+            });
+
+
+        document.getElementById(
+            "eventCount"
+        ).textContent =
+            visibleEvents.length;
+
+
+        /* Display table */
+
+        displayEvents(
+            visibleEvents
+        );
+
+
+        document.getElementById(
+            "searchResultText"
+        ).textContent =
+            visibleEvents.length +
+            " event(s) available.";
+
+
+        /* EVENT DROPDOWN */
+
+        const select =
+            document.getElementById(
+                "eventSelect"
+            );
+
+
+        select.innerHTML =
+            '<option value="">Select Event</option>';
+
+
+        visibleEvents.forEach(event => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                event.event_id;
+
+
+            option.textContent =
+                "#" +
+                event.event_id +
+                " - " +
+                (
+                    event.event_name ||
+                    event.name ||
+                    event.title ||
+                    "Event"
+                );
+
+
+            select.appendChild(
+                option
+            );
+
+        });
+
+        updateBookingPrice();
+
+
+        /*
+           If customer already typed
+           something in search box,
+           apply the search again.
+        */
+
+        const searchInput =
+            document.getElementById(
+                "eventSearch"
+            );
+
+
+        if (
+            searchInput.value.trim()
+            !== ""
+        ) {
+
+            searchEvents();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "searchResultText"
+        ).textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =========================================
+   SEARCH EVENTS
+========================================= */
+
+function searchEvents() {
+
+    const input =
+        document.getElementById(
+            "eventSearch"
+        );
+
+
+    const keyword =
+        input.value
+            .trim()
+            .toLowerCase();
+
+
+    /* Get published events */
+
+    const publishedEvents =
+        eventRecords.filter(event => {
+
+            if (!event.status) {
+
+                return true;
+
+            }
+
+
+            return (
+                String(event.status)
+                    .toLowerCase()
+                === "published"
+            );
+
+        });
+
+
+    /* Empty search */
+
+    if (keyword === "") {
+
+        displayEvents(
+            publishedEvents
+        );
+
+
+        document.getElementById(
+            "searchResultText"
+        ).textContent =
+            publishedEvents.length +
+            " event(s) available.";
+
+
+        return;
+
+    }
+
+
+    /* Search */
+
+    const filteredEvents =
+        publishedEvents.filter(event => {
+
+            const eventName =
+                String(
+                    event.event_name ||
+                    event.name ||
+                    event.title ||
+                    ""
+                ).toLowerCase();
+
+
+            const venue =
+                String(
+                    event.venue_name ||
+                    event.venue ||
+                    event.venue_id ||
+                    ""
+                ).toLowerCase();
+
+
+            const date =
+                String(
+                    event.event_date ||
+                    event.date ||
+                    event.event_datetime ||
+                    ""
+                ).toLowerCase();
+
+
+            const status =
+                String(
+                    event.status ||
+                    ""
+                ).toLowerCase();
+
+
+            return (
+                eventName.includes(
+                    keyword
+                ) ||
+
+                venue.includes(
+                    keyword
+                ) ||
+
+                date.includes(
+                    keyword
+                ) ||
+
+                status.includes(
+                    keyword
+                )
+            );
+
+        });
+
+
+    displayEvents(
+        filteredEvents
+    );
+
+
+    document.getElementById(
+        "searchResultText"
+    ).textContent =
+        filteredEvents.length +
+        " event(s) found.";
+
+}
+
+
+/* =========================================
+   CLEAR SEARCH
+========================================= */
+
+function clearEventSearch() {
+
+    const input =
+        document.getElementById(
+            "eventSearch"
+        );
+
+
+    input.value = "";
+
+
+    searchEvents();
+
+
+    input.focus();
+
+}
+
+
+/* =========================================
+   SELECT EVENT
+========================================= */
+
+function selectEvent(eventId) {
+
+    document.getElementById(
+        "eventSelect"
+    ).value = eventId;
+
+    updateBookingPrice();
+
+    document.getElementById(
+        "bookingFormCard"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+/* =========================================
+   CREATE BOOKING
+========================================= */
+
+document.getElementById("bookingForm").addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+        const bookingMessage =
+            document.getElementById("bookingMessage");
+
+        bookingMessage.textContent = "";
+
+
+        // Get selected event
+        const eventId =
+            Number(
+                document.getElementById("eventSelect").value
+            );
+
+
+        // Get ticket quantity
+        const quantity =
+            Number(
+                document.getElementById("quantity").value
+            );
+
+
+        // Get payment method
+        const paymentMethod =
+            document.getElementById("paymentMethod").value;
+
+
+        /* VALIDATION */
+
+        if (!eventId) {
+
+            bookingMessage.textContent =
+                "Please select an event.";
+
+            bookingMessage.style.color = "red";
+
+            return;
+        }
+
+
+        if (
+            !Number.isInteger(quantity) ||
+            quantity < 1 ||
+            quantity > 10
+        ) {
+
+            bookingMessage.textContent =
+                "Ticket quantity must be between 1 and 10.";
+
+            bookingMessage.style.color = "red";
+
+            return;
+        }
+
+
+        if (!paymentMethod) {
+
+            bookingMessage.textContent =
+                "Please select a payment method.";
+
+            bookingMessage.style.color = "red";
+
+            return;
+        }
+
+
+        /* DATA SENT TO bookings.php */
+
+        const body = {
+            event_id: eventId,
+            quantity: quantity
+        };
+
+
+        console.log(
+            "POST BOOKING DATA:",
+            body
+        );
+
+
+        try {
+
+            bookingMessage.textContent =
+                "Processing booking...";
+
+            bookingMessage.style.color =
+                "#555";
+
+
+            const result =
+                await request(
+                    "POST",
+                    BOOKINGS_API,
+                    body
+                );
+
+
+            console.log(
+                "POST BOOKING RESPONSE:",
+                result
+            );
+
+
+            bookingMessage.textContent =
+                "Booking successful!";
+
+            bookingMessage.style.color =
+                "green";
+
+
+            /*
+                Refresh data AFTER
+                successful booking
+            */
+
+            await loadBookings();
+
+            await loadEvents();
+
+
+            /*
+                Reset booking form
+            */
+
+            document
+                .getElementById("bookingForm")
+                .reset();
+
+
+            document
+                .getElementById("ticketPriceDisplay")
+                .value =
+                "RM 0.00";
+
+
+            document
+                .getElementById("totalPriceDisplay")
+                .value =
+                "RM 0.00";
+
+
+            /*
+                Go to My Bookings
+            */
+
+            showSection("bookings");
+
+
+        } catch (error) {
+
+            console.error(
+                "CREATE BOOKING ERROR:",
+                error
+            );
+
+
+            bookingMessage.textContent =
+                error.message ||
+                "Booking failed.";
+
+            bookingMessage.style.color =
+                "red";
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   CANCEL BOOKING
+========================================= */
+
+async function loadBookings() {
+
+    try {
+
+        const result = await request(
+            "GET",
+            BOOKINGS_API
+        );
+
+        const bookingRecords =
+            result.data ||
+            result.bookings ||
+            [];
+
+        // Sort booking ID ascending
+        bookingRecords.sort(
+            (a, b) =>
+                Number(a.booking_id) -
+                Number(b.booking_id)
+        );
+
+        // Update dashboard booking count
+        const bookingCount =
+            document.getElementById("bookingCount");
+
+        if (bookingCount) {
+            bookingCount.textContent =
+                bookingRecords.length;
+        }
+
+        // Count confirmed bookings
+        const confirmedCount =
+            bookingRecords.filter(
+                booking =>
+                    String(
+                        booking.booking_status ||
+                        booking.status ||
+                        ""
+                    ).toLowerCase() === "confirmed"
+            ).length;
+
+        const confirmedElement =
+            document.getElementById("confirmedCount");
+
+        if (confirmedElement) {
+            confirmedElement.textContent =
+                confirmedCount;
+        }
+
+        // Find My Bookings table body
+        const tbody =
+            document.getElementById("bookingTableBody");
+
+        if (!tbody) {
+            console.error(
+                "bookingTableBody not found."
+            );
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        if (bookingRecords.length === 0) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        style="text-align:center;">
+                        No booking records found.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        bookingRecords.forEach(booking => {
+
+            const status =
+                booking.booking_status ||
+                booking.status ||
+                "Confirmed";
+
+            const isCancelled =
+                String(status).toLowerCase()
+                === "cancelled";
+
+            const row =
+                document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    ${booking.booking_id}
+                </td>
+
+                <td>
+                    ${booking.event_id}
+                </td>
+
+                <td>
+                    ${booking.quantity}
+                </td>
+
+                <td>
+                    ${Number(
+                        booking.total_price || 0
+                    ).toFixed(2)}
+                </td>
+
+                <td>
+                    <span class="${
+                        isCancelled
+                            ? "status-cancelled"
+                            : "status-confirmed"
+                    }">
+                        ${status}
+                    </span>
+                </td>
+
+                <td>
+                    ${
+                        isCancelled
+? `
+    <button
+        class="danger-btn"
+        disabled
+        style="opacity: 0.45; cursor: not-allowed;"
+    >
+        Cancelled
+    </button>
+  `
+: `
+    <button
+        class="danger-btn"
+        onclick="cancelBooking(${booking.booking_id})"
+    >
+        Cancel
+    </button>
+  `
+                    }
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Load bookings error:",
+            error
+        );
+
+    }
+}
+
+async function cancelBooking(
+    bookingId
+) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to cancel Booking #" +
+            bookingId +
+            "?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const body = {
+
+            status:
+                "Cancelled",
+
+            booking_status:
+                "Cancelled"
+
+        };
+
+
+        await request(
+            "PUT",
+            BOOKINGS_API +
+            "?id=" +
+            bookingId,
+            body
+        );
+
+
+        alert(
+            "Booking cancelled successfully."
+        );
+
+
+        await loadBookings();
+
+        await loadEvents();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+function logout() {
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "user"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* =========================================
+   INITIAL LOAD
+========================================= */
+
+async function initialiseCustomerDashboard() {
+
+    try {
+
+        await loadEvents();
+
+        await loadBookings();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+    
+
+}
+
+
+initialiseCustomerDashboard();
+
+</script>
+
+</body>
+</html>

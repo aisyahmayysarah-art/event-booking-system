@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administrator Dashboard - Event Booking System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: #6E8AAF;
+            color: white;
+            padding: 0 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            min-height: 70px;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,.12);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand small {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 2px;
+            font-weight: normal;
+            opacity: .8;
+            margin-top: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-links button {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,.85);
+            padding: 12px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .nav-links button:hover,
+        .nav-links button.active {
+            background: rgba(255,255,255,.17);
+            color: white;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #123361 ;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 35px auto 60px;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* =========================
+           WELCOME
+        ========================= */
+
+        .welcome-card {
+            background: linear-gradient(135deg, #2A4A91, #C1DADE);
+            color: white;
+
+            border-radius: 14px;
+            padding: 30px 35px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 8px 25px rgba(22,119,242,.18);
+        }
+
+        .welcome-card h1 {
+            margin-bottom: 8px;
+            font-size: 27px;
+        }
+
+        .welcome-card p {
+            opacity: .9;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           STAT CARDS
+        ========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 3px 14px rgba(0,0,0,.06);
+            border-left: 4px solid #2A4A91;
+        }
+
+        .stat-card p {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            color: #2A4A91;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 14px rgba(0,0,0,.06);
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+        }
+
+        .card-description {
+            color: #666;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+
+            border: 1px solid #d5d9df;
+            border-radius: 7px;
+
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2A4A91;
+            box-shadow: 0 0 0 3px rgba(22,119,242,.08);
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        button {
+            font-family: inherit;
+        }
+
+        .primary-btn {
+            background: #126161;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .primary-btn:hover {
+            background: #0967d9;
+        }
+
+        .secondary-btn {
+            background: #eef2f7;
+            color: #333;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #DFCEF0;
+            color: #1677f2;
+            border: none;
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .delete-btn {
+            background: #ffeaea;
+            color: #d63031;
+            border: none;
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #f0f4f9;
+            color: #333;
+            text-align: left;
+            padding: 13px;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e3e3e3;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #fafcff;
+        }
+
+        .record-count {
+            font-size: 13px;
+            color: #666;
+            margin: 12px 0;
+        }
+
+        /* =========================
+           BADGES
+        ========================= */
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e8f1ff;
+            color: #1677f2;
+        }
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<header class="navbar">
+
+    <div class="brand">
+        EVENT BOOKING
+        <small>ADMINISTRATOR PANEL</small>
+    </div>
+
+    <nav class="nav-links">
+
+        <button
+            class="nav-btn active"
+            onclick="showSection('dashboard', this)">
+            Dashboard Admin
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('users', this)">
+            Users
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('events', this)">
+            Events
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="window.location.href='venues.html'"
+        >
+            Venues
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('bookings', this)">
+            Bookings
+        </button>
+
+    </nav>
+
+    <button class="logout-btn" onclick="logout()">
+        Logout
+    </button>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- ==================================================
+     DASHBOARD
+================================================== -->
+
+<section id="dashboard" class="page-section active">
+
+    <div class="welcome-card">
+
+        <h1 id="welcome">
+            Welcome, Administrator
+        </h1>
+
+        <p>
+            Manage users and review event, venue and booking
+            information from the Event Booking System.
+        </p>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <p>TOTAL USERS</p>
+            <h2 id="totalUsers">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>TOTAL EVENTS</p>
+            <h2 id="totalEvents">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>TOTAL VENUES</p>
+            <h2 id="totalVenues">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>TOTAL BOOKINGS</p>
+            <h2 id="totalBookings">0</h2>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>System Overview</h2>
+
+        <p class="card-description">
+            The Administrator dashboard provides an overview of
+            the main records available in the system. Use the
+            navigation menu above to access each section.
+        </p>
+
+        <button
+            class="primary-btn"
+            onclick="refreshAll()">
+            Refresh Dashboard
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     USERS
+================================================== -->
+
+<section id="users" class="page-section">
+
+    <div class="card">
+
+        <h2>User Management</h2>
+
+        <p class="card-description">
+            Create, update and manage registered users.
+            User management functions are restricted to
+            the Administrator role.
+        </p>
+
+
+        <h3 id="formTitle">
+            Add New User
+        </h3>
+
+        <br>
+
+
+        <form id="userForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input
+                        id="name"
+                        type="text"
+                        placeholder="Enter full name"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Email Address
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="Enter email address"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="Enter password">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Role
+                    </label>
+
+                    <select id="role">
+
+                        <option value="Administrator">
+                            Administrator
+                        </option>
+
+                        <option value="Organiser">
+                            Organiser
+                        </option>
+
+                        <option value="Staff">
+                            Staff
+                        </option>
+
+                        <option value="Customer">
+                            Customer
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="saveBtn">
+                    Add User
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="resetForm()">
+                    Cancel / Clear
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <p id="message"></p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>User List</h2>
+
+        <p class="record-count" id="userCount">
+            Loading users...
+        </p>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="userRows">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     EVENTS
+================================================== -->
+
+<section id="events" class="page-section">
+
+    <div class="card">
+
+        <h2>Event Records</h2>
+
+        <p class="card-description">
+            View event records available in the Event Booking System.
+        </p>
+
+        <button
+            class="primary-btn"
+            onclick="loadEvents()">
+            Refresh Events
+        </button>
+
+        <p
+            class="record-count"
+            id="eventCount">
+        </p>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Event</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Available Tickets</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="eventRows">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     VENUES
+================================================== -->
+
+<section id="venues" class="page-section">
+
+    <div class="card">
+
+        <h2>Venue Records</h2>
+
+        <p class="card-description">
+            View venue information including location,
+            capacity and current venue status.
+        </p>
+
+        <button
+            class="primary-btn"
+            onclick="loadVenues()">
+            Refresh Venues
+        </button>
+
+        <p
+            class="record-count"
+            id="venueCount">
+        </p>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Venue</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="venueRows">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     BOOKINGS
+================================================== -->
+
+<section id="bookings" class="page-section">
+
+    <div class="card">
+
+        <h2>Booking Records</h2>
+
+        <p class="card-description">
+            View customer booking records including event,
+            quantity, total price and booking status.
+        </p>
+
+        <button
+            class="primary-btn"
+            onclick="loadBookings()">
+            Refresh Bookings
+        </button>
+
+        <p
+            class="record-count"
+            id="bookingCount">
+        </p>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer ID</th>
+                        <th>Event ID</th>
+                        <th>Quantity</th>
+                        <th>Total Price (RM)</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="bookingRows">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<script>
+
+/* ==================================================
+   API
+================================================== */
+
+const USERS_API =
+    "../backend/users.php";
+
+const EVENTS_API =
+    "../backend/events.php";
+
+const VENUES_API =
+    "../backend/venues.php";
+
+const BOOKINGS_API =
+    "../backend/bookings.php";
+
+
+const token =
+    localStorage.getItem("token");
+
+let user = null;
+
+let users = [];
+
+let editingId = null;
+
+
+try {
+
+    user =
+        JSON.parse(
+            localStorage.getItem("user") || "null"
+        );
+
+} catch (error) {
+
+    user = null;
+}
+
+
+/* ==================================================
+   SECURITY CHECK
+================================================== */
+
+if (
+    !token ||
+    !user ||
+    user.role !== "Administrator"
+) {
+
+    window.location.replace(
+        "login.html"
+    );
+
+} else {
+
+    document.getElementById(
+        "welcome"
+    ).textContent =
+        "Welcome, " + user.name;
+
+    refreshAll();
+}
+
+
+/* ==================================================
+   NAVIGATION
+================================================== */
+
+function showSection(sectionId, button) {
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    document.getElementById(
+        sectionId
+    ).classList.add(
+        "active"
+    );
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+    }
+
+
+    if (sectionId === "users") {
+
+        loadUsers();
+
+    } else if (sectionId === "events") {
+
+        loadEvents();
+
+    } else if (sectionId === "venues") {
+
+        loadVenues();
+
+    } else if (sectionId === "bookings") {
+
+        loadBookings();
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* ==================================================
+   API REQUEST
+================================================== */
+
+async function request(
+    method,
+    url,
+    body = null
+) {
+
+    const options = {
+
+        method: method,
+
+        headers: {
+            "Authorization":
+                "Bearer " + token
+        }
+
+    };
+
+
+    if (body !== null) {
+
+        options.headers[
+            "Content-Type"
+        ] = "application/json";
+
+        options.body =
+            JSON.stringify(body);
+    }
+
+
+    const response =
+        await fetch(
+            url,
+            options
+        );
+
+
+    let data;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        throw new Error(
+            "Invalid server response."
+        );
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "Request failed."
+        );
+    }
+
+
+    return data;
+}
+
+
+/* ==================================================
+   REFRESH ALL
+================================================== */
+
+async function refreshAll() {
+
+    await Promise.allSettled([
+        loadUsers(),
+        loadEvents(),
+        loadVenues(),
+        loadBookings()
+    ]);
+}
+
+
+/* ==================================================
+   USERS
+================================================== */
+
+async function loadUsers() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                USERS_API
+            );
+
+
+        users =
+            result.data ||
+            result.users ||
+            [];
+
+
+        document.getElementById(
+            "totalUsers"
+        ).textContent =
+            users.length;
+
+
+        document.getElementById(
+            "userCount"
+        ).textContent =
+            users.length +
+            " record(s) found.";
+
+
+        const tbody =
+            document.getElementById(
+                "userRows"
+            );
+
+
+        tbody.replaceChildren();
+
+
+        users.forEach(currentUser => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                tr,
+                currentUser.user_id
+            );
+
+            addCell(
+                tr,
+                currentUser.name
+            );
+
+            addCell(
+                tr,
+                currentUser.email
+            );
+
+
+            const roleTd =
+                document.createElement(
+                    "td"
+                );
+
+            const badge =
+                document.createElement(
+                    "span"
+                );
+
+            badge.className =
+                "badge";
+
+            badge.textContent =
+                currentUser.role;
+
+            roleTd.appendChild(
+                badge
+            );
+
+            tr.appendChild(
+                roleTd
+            );
+
+
+            const actionTd =
+                document.createElement(
+                    "td"
+                );
+
+
+            const editBtn =
+                document.createElement(
+                    "button"
+                );
+
+            editBtn.textContent =
+                "Edit";
+
+            editBtn.className =
+                "edit-btn";
+
+            editBtn.onclick =
+                () =>
+                    editUser(
+                        currentUser.user_id
+                    );
+
+
+            const deleteBtn =
+                document.createElement(
+                    "button"
+                );
+
+            deleteBtn.textContent =
+                "Delete";
+
+            deleteBtn.className =
+                "delete-btn";
+
+            deleteBtn.onclick =
+                () =>
+                    deleteUser(
+                        currentUser.user_id
+                    );
+
+
+            actionTd.append(
+                editBtn,
+                deleteBtn
+            );
+
+
+            tr.appendChild(
+                actionTd
+            );
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        });
+
+
+    } catch (error) {
+
+        showMessage(
+            error.message,
+            true
+        );
+    }
+}
+
+
+/* ==================================================
+   USER FORM
+================================================== */
+
+document.getElementById(
+    "userForm"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const body = {
+
+            name:
+                document
+                    .getElementById("name")
+                    .value
+                    .trim(),
+
+            email:
+                document
+                    .getElementById("email")
+                    .value
+                    .trim(),
+
+            role:
+                document
+                    .getElementById("role")
+                    .value
+
+        };
+
+
+        const password =
+            document
+                .getElementById(
+                    "password"
+                )
+                .value;
+
+
+        if (password !== "") {
+
+            body.password =
+                password;
+        }
+
+
+        try {
+
+            if (editingId === null) {
+
+                if (password === "") {
+
+                    showMessage(
+                        "Password is required for a new user.",
+                        true
+                    );
+
+                    return;
+                }
+
+
+                await request(
+                    "POST",
+                    USERS_API,
+                    body
+                );
+
+
+                showMessage(
+                    "User added successfully."
+                );
+
+
+            } else {
+
+                await request(
+                    "PUT",
+                    USERS_API +
+                    "?id=" +
+                    editingId,
+                    body
+                );
+
+
+                showMessage(
+                    "User updated successfully."
+                );
+            }
+
+
+            resetForm();
+
+            await loadUsers();
+
+
+        } catch (error) {
+
+            showMessage(
+                error.message,
+                true
+            );
+        }
+    }
+);
+
+
+/* ==================================================
+   EDIT USER
+================================================== */
+
+function editUser(id) {
+
+    const selected =
+        users.find(
+            item =>
+                Number(item.user_id) ===
+                Number(id)
+        );
+
+
+    if (!selected) {
+
+        return;
+    }
+
+
+    editingId = id;
+
+
+    document.getElementById(
+        "name"
+    ).value =
+        selected.name;
+
+
+    document.getElementById(
+        "email"
+    ).value =
+        selected.email;
+
+
+    document.getElementById(
+        "role"
+    ).value =
+        selected.role;
+
+
+    document.getElementById(
+        "password"
+    ).value = "";
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Edit User #" + id;
+
+
+    document.getElementById(
+        "saveBtn"
+    ).textContent =
+        "Update User";
+
+
+    window.scrollTo({
+        top: 70,
+        behavior: "smooth"
+    });
+}
+
+
+/* ==================================================
+   DELETE USER
+================================================== */
+
+async function deleteUser(id) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete User #" +
+            id +
+            "?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    try {
+
+        await request(
+            "DELETE",
+            USERS_API +
+            "?id=" +
+            id
+        );
+
+
+        showMessage(
+            "User deleted successfully."
+        );
+
+
+        resetForm();
+
+        await loadUsers();
+
+
+    } catch (error) {
+
+        showMessage(
+            error.message,
+            true
+        );
+    }
+}
+
+
+/* ==================================================
+   RESET USER FORM
+================================================== */
+
+function resetForm() {
+
+    editingId = null;
+
+
+    document.getElementById(
+        "userForm"
+    ).reset();
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Add New User";
+
+
+    document.getElementById(
+        "saveBtn"
+    ).textContent =
+        "Add User";
+}
+
+
+/* ==================================================
+   EVENTS
+================================================== */
+
+async function loadEvents() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                EVENTS_API
+            );
+
+
+        const records =
+            result.data ||
+            result.events ||
+            [];
+
+
+        document.getElementById(
+            "totalEvents"
+        ).textContent =
+            records.length;
+
+
+        document.getElementById(
+            "eventCount"
+        ).textContent =
+            records.length +
+            " record(s) found.";
+
+
+        const tbody =
+            document.getElementById(
+                "eventRows"
+            );
+
+
+        tbody.replaceChildren();
+
+
+        records.forEach(event => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                tr,
+                event.event_id
+            );
+
+            addCell(
+                tr,
+                event.event_name ||
+                event.title ||
+                event.name
+            );
+
+            addCell(
+                tr,
+                event.venue_name ||
+                event.venue_id
+            );
+
+            addCell(
+                tr,
+                event.event_date ||
+                event.date
+            );
+
+            addCell(
+                tr,
+                event.available_tickets
+            );
+
+            addCell(
+                tr,
+                event.status
+            );
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Events:",
+            error
+        );
+    }
+}
+
+
+/* ==================================================
+   VENUES
+================================================== */
+
+async function loadVenues() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                VENUES_API
+            );
+
+
+        const records =
+            result.data ||
+            result.venues ||
+            [];
+
+
+        document.getElementById(
+            "totalVenues"
+        ).textContent =
+            records.length;
+
+
+        document.getElementById(
+            "venueCount"
+        ).textContent =
+            records.length +
+            " record(s) found.";
+
+
+        const tbody =
+            document.getElementById(
+                "venueRows"
+            );
+
+
+        tbody.replaceChildren();
+
+
+        records.forEach(venue => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                tr,
+                venue.venue_id
+            );
+
+            addCell(
+                tr,
+                venue.venue_name
+            );
+
+            addCell(
+                tr,
+                venue.location
+            );
+
+            addCell(
+                tr,
+                venue.capacity
+            );
+
+            addCell(
+                tr,
+                venue.status
+            );
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Venues:",
+            error
+        );
+    }
+}
+
+
+/* ==================================================
+   BOOKINGS
+================================================== */
+
+async function loadBookings() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                BOOKINGS_API
+            );
+
+
+        const records =
+            result.data ||
+            result.bookings ||
+            [];
+
+
+        document.getElementById(
+            "totalBookings"
+        ).textContent =
+            records.length;
+
+
+        document.getElementById(
+            "bookingCount"
+        ).textContent =
+            records.length +
+            " record(s) found.";
+
+
+        const tbody =
+            document.getElementById(
+                "bookingRows"
+            );
+
+
+        tbody.replaceChildren();
+
+        records.sort((a, b) => Number(a.booking_id) - Number(b.booking_id));
+        records.forEach(booking => {
+
+            const tr =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                tr,
+                booking.booking_id
+            );
+
+            addCell(
+                tr,
+                booking.user_id ||
+                booking.customer_id
+            );
+
+            addCell(
+                tr,
+                booking.event_id
+            );
+
+            addCell(
+                tr,
+                booking.quantity
+            );
+
+            addCell(
+                tr,
+                booking.total_price
+            );
+
+            addCell(
+                tr,
+                booking.booking_status || booking.status
+            );
+
+
+            tbody.appendChild(
+                tr
+            );
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Bookings:",
+            error
+        );
+    }
+}
+
+
+/* ==================================================
+   HELPER
+================================================== */
+
+function addCell(row, value) {
+
+    const td =
+        document.createElement(
+            "td"
+        );
+
+
+    td.textContent =
+        value ?? "-";
+
+
+    row.appendChild(
+        td
+    );
+}
+
+
+function showMessage(
+    text,
+    error = false
+) {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    message.textContent =
+        text;
+
+
+    message.style.color =
+        error
+            ? "#d63031"
+            : "#00a878";
+}
+
+
+/* ==================================================
+   LOGOUT
+================================================== */
+
+function logout() {
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "user"
+    );
+
+
+    window.location.href =
+        "login.html";
+}
+
+</script>
+
+</body>
+</html>

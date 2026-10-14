@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Event Booking System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #6E8AAF;
+        }
+
+        /* MAIN LOGIN PAGE */
+        .login-page {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 40px 70px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1050px;
+
+            display: grid;
+            grid-template-columns: 1fr 430px;
+
+            gap: 90px;
+            align-items: center;
+        }
+
+        /* ==========================
+           LEFT SIDE
+        ========================== */
+
+        .login-info {
+            color: white;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 58px;
+            height: 58px;
+
+            border: 2px solid rgba(255,255,255,.9);
+            border-radius: 16px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .brand-text h1 {
+            font-size: 31px;
+            letter-spacing: 1px;
+        }
+
+        .brand-text p {
+            margin-top: 3px;
+
+            font-size: 13px;
+            letter-spacing: 3px;
+
+            opacity: .85;
+        }
+
+        .divider {
+            width: 100%;
+            max-width: 430px;
+
+            height: 1px;
+
+            background: rgba(255,255,255,.18);
+
+            margin-bottom: 25px;
+        }
+
+        .login-info h2 {
+            max-width: 470px;
+
+            font-size: 36px;
+            line-height: 1.2;
+
+            margin-bottom: 18px;
+        }
+
+        .login-info .description {
+            max-width: 460px;
+
+            font-size: 16px;
+            line-height: 1.7;
+
+            color: rgba(255,255,255,.88);
+        }
+
+        .dots {
+            display: flex;
+            gap: 5px;
+
+            margin-top: 40px;
+        }
+
+        .dots span {
+            width: 6px;
+            height: 6px;
+
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* ==========================
+           LOGIN CARD
+        ========================== */
+
+        .login-container {
+            width: 100%;
+
+            background: white;
+
+            padding: 42px 40px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,.18);
+        }
+
+        .login-container h1 {
+            color: #181818;
+
+            font-size: 29px;
+
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #666;
+
+            font-size: 14px;
+
+            margin-bottom: 28px;
+        }
+
+        /* FORM */
+
+        label {
+            display: block;
+
+            color: #333;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 14px 15px;
+
+            margin-bottom: 20px;
+
+            border: 1px solid #d7d7d7;
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            background: white;
+
+            transition: .2s;
+        }
+
+        input:focus {
+            outline: none;
+
+            border-color: #1677f2;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(22,119,242,.10);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        /* LOGIN BUTTON */
+
+        .login-btn {
+            width: 100%;
+
+            border: none;
+            border-radius: 7px;
+
+            padding: 14px;
+
+            margin-top: 3px;
+
+            background: #6DB08D;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .login-btn:hover {
+            background: #0967d9;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px
+                rgba(22,119,242,.25);
+        }
+
+        /* ERROR MESSAGE */
+
+        .error {
+            margin-top: 15px;
+
+            color: #d63031;
+
+            font-size: 13px;
+        }
+
+        /* REGISTER */
+
+        .register-link {
+            text-align: center;
+
+            margin-top: 23px;
+
+            font-size: 14px;
+
+            color: #555;
+        }
+
+        .register-link a {
+            color: #1DB4C2;
+
+            font-weight: bold;
+
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 900px) {
+
+            .login-page {
+                padding: 40px 25px;
+            }
+
+            .login-wrapper {
+                grid-template-columns: 1fr;
+
+                max-width: 500px;
+
+                gap: 35px;
+            }
+
+            .login-info {
+                text-align: center;
+            }
+
+            .brand {
+                justify-content: center;
+            }
+
+            .divider {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .login-info h2,
+            .login-info .description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .dots {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 520px) {
+
+            .login-page {
+                padding: 25px 15px;
+            }
+
+            .login-info h2 {
+                font-size: 28px;
+            }
+
+            .brand-text h1 {
+                font-size: 25px;
+            }
+
+            .login-container {
+                padding: 32px 25px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="login-page">
+
+    <div class="login-wrapper">
+
+        <!-- LEFT SIDE -->
+        <div class="login-info">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    E
+                </div>
+
+                <div class="brand-text">
+                    <h1>EVENT BOOKING</h1>
+                    <p>BOOK • ENJOY • EXPERIENCE</p>
+                </div>
+
+            </div>
+
+            <div class="divider"></div>
+
+            <h2>
+                Discover events.<br>
+                Book your experience.
+            </h2>
+
+            <p class="description">
+                A simple and convenient Event Booking System
+                for discovering events and managing your bookings.
+            </p>
+
+            <div class="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE LOGIN -->
+        <div class="login-container">
+
+            <h1>Sign in</h1>
+
+            <p class="login-subtitle">
+                Welcome back! Sign in to continue.
+            </p>
+
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+            >
+
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+            >
+
+
+            <button
+                class="login-btn"
+                onclick="login()"
+            >
+                Login
+            </button>
+
+
+            <p id="message" class="error"></p>
+
+
+            <p class="register-link">
+                Don't have an account?
+                <a href="register.html">
+                    Register here
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function login() {
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    message.innerText = "";
+
+    if (email === "" || password === "") {
+
+        message.innerText =
+            "Please enter email and password.";
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "../backend/login.php",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (
+            response.ok &&
+            data.success &&
+            data.token &&
+            data.user
+        ) {
+
+            const role = data.user.role;
+
+            let redirectPage = "";
+
+            if (role === "Administrator") {
+
+                redirectPage = "users.html";
+
+            } else if (
+                role === "Organiser" ||
+                role === "Staff"
+            ) {
+
+                redirectPage = "organiser.html";
+
+            } else if (role === "Customer") {
+
+                redirectPage = "customer.html";
+
+            } else {
+
+                message.innerText =
+                    "Access denied. Invalid user role.";
+
+                return;
+            }
+
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
+
+            window.location.href =
+                redirectPage;
+
+        } else {
+
+            message.innerText =
+                data.message || "Login failed.";
+        }
+
+    } catch (error) {
+
+        message.innerText =
+            "Unable to connect to server.";
+    }
+}
+
+
+/* ENTER KEY LOGIN */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+            login();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

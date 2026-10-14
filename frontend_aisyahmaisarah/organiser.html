@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Organiser Dashboard - Event Booking System</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .organiser-navbar {
+            width: 100%;
+            background: #6E8AAF;
+            color: white;
+            padding: 16px 45px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .brand p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            opacity: 0.85;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .logout-btn {
+            background: white;
+            color: #123361;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #eef5ff;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .page-container {
+            width: 90%;
+            max-width: 1180px;
+            margin: 35px auto;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2,
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           WELCOME
+        ========================= */
+
+        .welcome-card {
+            background: linear-gradient(135deg, #5A5F6E, #C1DADE);
+            color: white;
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(25, 118, 243, 0.2);
+        }
+
+        .welcome-card h1 {
+            margin: 0 0 10px;
+        }
+
+        .welcome-card p {
+            margin: 5px 0;
+        }
+
+        /* =========================
+           STATS
+        ========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card h3 {
+            margin-top: 0;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2A4A91;
+            margin: 8px 0;
+        }
+
+        .stat-card p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        /* =========================
+           TOOLBAR + SEARCH
+        ========================= */
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 46px;
+            padding: 0 45px 0 42px;
+            border: 1px solid #d7deea;
+            border-radius: 10px;
+            background: #f8faff;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1976f3;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(25, 118, 243, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            width: 30px;
+            height: 30px;
+
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .clear-search-btn:hover {
+            background: #e8eef7;
+        }
+
+        .record-count {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .event-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1976f3;
+            box-shadow: 0 0 0 3px rgba(25, 118, 243, 0.1);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .primary-btn {
+            background: #126161;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .primary-btn:hover {
+            background: #0f65d8;
+        }
+
+        .secondary-btn {
+            background: #e5e7eb;
+            color: #1f2937;
+            border: none;
+            border-radius: 7px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .secondary-btn:hover {
+            background: #d5d7db;
+        }
+
+        .edit-btn {
+            background: #DFCEF0;
+            color: #0b57d0;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 13px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 13px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .edit-btn:hover {
+            background: #cfe3ff;
+        }
+
+        .delete-btn:hover {
+            background: #bd2634;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #edf3fb;
+            padding: 14px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .published {
+            background: #dcecff;
+            color: #0b57d0;
+        }
+
+        .draft {
+            background: #ececec;
+            color: #555;
+        }
+
+        .confirmed {
+            background: #dff6e7;
+            color: #137333;
+        }
+
+        .pending {
+            background: #fff2cc;
+            color: #8a6100;
+        }
+
+        .cancelled {
+            background: #fde2e2;
+            color: #b3261e;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #16803c;
+        }
+
+        .error-message {
+            color: #d93025;
+        }
+
+        .empty-row {
+            text-align: center;
+            padding: 30px !important;
+            color: #6b7280;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 850px) {
+
+            .organiser-navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .event-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full,
+            .form-actions {
+                grid-column: auto;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<header class="organiser-navbar">
+
+    <div class="brand">
+        <h2>EVENT BOOKING</h2>
+        <p>ORGANISER / STAFF PANEL</p>
+    </div>
+
+    <nav class="nav-menu">
+
+        <button
+            class="nav-btn active"
+            onclick="showSection('dashboard', this)"
+        >
+            Dashboard Organiser
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('events', this)"
+        >
+            Events
+        </button>
+
+        <button
+            class="nav-btn"
+            onclick="showSection('bookings', this)"
+        >
+            Bookings
+        </button>
+
+    </nav>
+
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        Logout
+    </button>
+
+</header>
+
+
+<main class="page-container">
+
+    <!-- =========================
+         DASHBOARD
+    ========================= -->
+
+    <section
+        id="dashboard"
+        class="page-section active"
+    >
+
+        <div class="welcome-card">
+
+            <h1 id="welcomeUser">
+                Welcome!
+            </h1>
+
+            <p>
+                Manage event information and view booking records from the Event Booking System.
+            </p>
+
+            <p id="userInformation"></p>
+
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat-card">
+
+                <h3>Total Events</h3>
+
+                <div
+                    class="number"
+                    id="totalEvents"
+                >
+                    0
+                </div>
+
+                <p>
+                    Event records available.
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>Published Events</h3>
+
+                <div
+                    class="number"
+                    id="publishedEvents"
+                >
+                    0
+                </div>
+
+                <p>
+                    Events currently published.
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>Bookings</h3>
+
+                <div
+                    class="number"
+                    id="totalBookings"
+                >
+                    0
+                </div>
+
+                <p>
+                    Booking records available.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         EVENTS
+    ========================= -->
+
+    <section
+        id="events"
+        class="page-section"
+    >
+
+        <!-- EVENT FORM -->
+
+        <div class="card">
+
+            <h2 id="eventFormTitle">
+                Add New Event
+            </h2>
+
+            <p class="subtitle">
+                Create a new event or update an existing event record.
+            </p>
+
+
+            <form
+                id="eventForm"
+                class="event-form"
+            >
+
+                <div class="form-group">
+
+                    <label for="eventName">
+                        Event Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="eventName"
+                        placeholder="Enter event name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="venueId">
+                        Venue ID
+                    </label>
+
+                    <input
+                        type="number"
+                        id="venueId"
+                        min="1"
+                        placeholder="Enter venue ID"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="eventDate">
+                        Event Date and Time
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="eventDate"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="ticketPrice">
+                        Ticket Price (RM)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="ticketPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="availableTickets">
+                        Total Tickets
+                    </label>
+
+                    <input
+                        type="number"
+                        id="availableTickets"
+                        min="0"
+                        placeholder="Enter ticket quantity"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="eventStatus">
+                        Status
+                    </label>
+
+                    <select id="eventStatus">
+
+                        <option value="published">
+                            Published
+                        </option>
+
+                        <option value="draft">
+                            Draft
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label for="eventDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="eventDescription"
+                        placeholder="Enter event description"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                        id="saveEventBtn"
+                    >
+                        Add Event
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="resetEventForm()"
+                    >
+                        Cancel / Clear
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <p
+                id="eventMessage"
+                class="message"
+            ></p>
+
+        </div>
+
+
+        <!-- EVENT LIST -->
+
+        <div class="card">
+
+            <h2>Event Management</h2>
+
+            <p class="subtitle">
+                View and manage event records available in the system.
+            </p>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="eventSearch"
+                        placeholder="Search event, venue, date or status..."
+                        oninput="searchEvents()"
+                    >
+
+                    <button
+                        type="button"
+                        class="clear-search-btn"
+                        onclick="clearEventSearch()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    onclick="loadEvents()"
+                >
+                    Refresh Events
+                </button>
+
+            </div>
+
+
+            <p
+                id="eventRecordCount"
+                class="record-count"
+            ></p>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Event</th>
+                            <th>Venue</th>
+                            <th>Date</th>
+                            <th>Price (RM)</th>
+                            <th>Tickets</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="eventRows"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         BOOKINGS
+    ========================= -->
+
+    <section
+        id="bookings"
+        class="page-section"
+    >
+
+        <div class="card">
+
+            <h2>Booking Records</h2>
+
+            <p class="subtitle">
+                View customer booking records related to the event booking system.
+            </p>
+
+
+            <div class="toolbar">
+
+                <div class="search-box">
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="bookingSearch"
+                        placeholder="Search booking ID, event ID or status..."
+                        oninput="searchBookings()"
+                    >
+
+                    <button
+                        type="button"
+                        class="clear-search-btn"
+                        onclick="clearBookingSearch()"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    onclick="loadBookings()"
+                >
+                    Refresh Bookings
+                </button>
+
+            </div>
+
+
+            <p
+                id="bookingRecordCount"
+                class="record-count"
+            ></p>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer ID</th>
+                            <th>Event ID</th>
+                            <th>Quantity</th>
+                            <th>Total Price (RM)</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="bookingRows"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* =========================
+   AUTHENTICATION
+========================= */
+
+const token =
+    localStorage.getItem("token");
+
+let user = null;
+
+try {
+
+    user = JSON.parse(
+        localStorage.getItem("user") || "null"
+    );
+
+} catch (error) {
+
+    user = null;
+
+}
+
+
+/*
+   Only Organiser and Staff
+   can access this page.
+*/
+
+if (
+    !token ||
+    !user ||
+    (
+        user.role !== "Organiser" &&
+        user.role !== "Staff"
+    )
+) {
+
+    window.location.replace(
+        "login.html"
+    );
+
+}
+
+
+/* =========================
+   API
+========================= */
+
+const EVENTS_API =
+    "../backend/events.php";
+
+const BOOKINGS_API =
+    "../backend/bookings.php";
+
+
+let events = [];
+let bookings = [];
+let editingEventId = null;
+
+
+/* =========================
+   USER INFORMATION
+========================= */
+
+if (user) {
+
+    document.getElementById(
+        "welcomeUser"
+    ).textContent =
+        "Welcome, " + user.name + "!";
+
+
+    document.getElementById(
+        "userInformation"
+    ).textContent =
+        user.email + " | " + user.role;
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function showSection(
+    sectionId,
+    button
+) {
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(nav => {
+
+            nav.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    document
+        .getElementById(sectionId)
+        .classList.add("active");
+
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if (sectionId === "events") {
+
+        loadEvents();
+
+    }
+
+
+    if (sectionId === "bookings") {
+
+        loadBookings();
+
+    }
+
+}
+
+
+/* =========================
+   REQUEST FUNCTION
+========================= */
+
+async function request(
+    method,
+    url,
+    body = null
+) {
+
+    const options = {
+
+        method: method,
+
+        headers: {
+            "Authorization":
+                "Bearer " + token
+        }
+
+    };
+
+
+    if (body !== null) {
+
+        options.headers[
+            "Content-Type"
+        ] = "application/json";
+
+        options.body =
+            JSON.stringify(body);
+
+    }
+
+
+    const response =
+        await fetch(url, options);
+
+
+    let data;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        throw new Error(
+            "Invalid response from server."
+        );
+
+    }
+
+
+    if (!response.ok) {
+
+        if (response.status === 401) {
+
+            localStorage.removeItem(
+                "token"
+            );
+
+            localStorage.removeItem(
+                "user"
+            );
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return;
+
+        }
+
+
+        throw new Error(
+            data.message ||
+            "Request failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================
+   TABLE CELL
+========================= */
+
+function addCell(
+    row,
+    value
+) {
+
+    const td =
+        document.createElement("td");
+
+    td.textContent =
+        value ?? "-";
+
+    row.appendChild(td);
+
+}
+
+
+/* =========================
+   STATUS BADGE
+========================= */
+
+function createStatus(status) {
+
+    const span =
+        document.createElement("span");
+
+
+    const value =
+        String(status || "-")
+            .toLowerCase();
+
+
+    span.className =
+        "status " + value;
+
+
+    span.textContent =
+        status || "-";
+
+
+    return span;
+
+}
+
+
+/* =========================
+   LOAD EVENTS
+========================= */
+
+async function loadEvents() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                EVENTS_API
+            );
+
+
+        events =
+            result.data ||
+            result.events ||
+            [];
+
+
+        /*
+           Arrange IDs:
+           1, 2, 3, 4...
+        */
+
+        events.sort(
+            (a, b) =>
+                Number(a.event_id) -
+                Number(b.event_id)
+        );
+
+
+        updateEventStatistics();
+
+        displayEvents(events);
+
+
+        document.getElementById(
+            "eventRecordCount"
+        ).textContent =
+            events.length +
+            " record(s) found.";
+
+
+        /*
+           Reapply search if
+           something is typed.
+        */
+
+        const search =
+            document.getElementById(
+                "eventSearch"
+            );
+
+
+        if (
+            search &&
+            search.value.trim() !== ""
+        ) {
+
+            searchEvents();
+
+        }
+
+
+    } catch (error) {
+
+        document.getElementById(
+            "eventRecordCount"
+        ).textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =========================
+   EVENT STATISTICS
+========================= */
+
+function updateEventStatistics() {
+
+    document.getElementById(
+        "totalEvents"
+    ).textContent =
+        events.length;
+
+
+    const published =
+        events.filter(event => {
+
+            return (
+                String(
+                    event.status || ""
+                ).toLowerCase()
+                === "published"
+            );
+
+        });
+
+
+    document.getElementById(
+        "publishedEvents"
+    ).textContent =
+        published.length;
+
+}
+
+
+/* =========================
+   DISPLAY EVENTS
+========================= */
+
+function displayEvents(records) {
+
+    const tbody =
+        document.getElementById(
+            "eventRows"
+        );
+
+
+    tbody.replaceChildren();
+
+
+    if (records.length === 0) {
+
+        const tr =
+            document.createElement("tr");
+
+        const td =
+            document.createElement("td");
+
+
+        td.colSpan = 8;
+
+        td.className =
+            "empty-row";
+
+        td.textContent =
+            "No event records found.";
+
+
+        tr.appendChild(td);
+
+        tbody.appendChild(tr);
+
+        return;
+
+    }
+
+
+    records.forEach(event => {
+
+        const tr =
+            document.createElement("tr");
+
+
+        addCell(
+            tr,
+            event.event_id
+        );
+
+
+        addCell(
+            tr,
+            event.event_name ||
+            event.name ||
+            event.title
+        );
+
+
+        addCell(
+            tr,
+            event.venue_name ||
+            event.venue ||
+            event.venue_id
+        );
+
+
+        addCell(
+            tr,
+            event.event_date ||
+            event.date ||
+            event.event_datetime
+        );
+
+
+        addCell(
+            tr,
+            event.ticket_price ||
+            event.price
+        );
+
+
+        addCell(
+            tr,
+            event.available_tickets
+        );
+
+
+        /* STATUS */
+
+        const statusTd =
+            document.createElement("td");
+
+
+        statusTd.appendChild(
+            createStatus(
+                event.status
+            )
+        );
+
+
+        tr.appendChild(
+            statusTd
+        );
+
+
+        /* ACTION */
+
+        const actionTd =
+            document.createElement("td");
+
+
+        const editBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        editBtn.textContent =
+            "Edit";
+
+        editBtn.className =
+            "edit-btn";
+
+        editBtn.onclick =
+            () =>
+                editEvent(
+                    event.event_id
+                );
+
+
+        const deleteBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        deleteBtn.textContent =
+            "Delete";
+
+        deleteBtn.className =
+            "delete-btn";
+
+        deleteBtn.onclick =
+            () =>
+                deleteEvent(
+                    event.event_id
+                );
+
+
+        actionTd.append(
+            editBtn,
+            deleteBtn
+        );
+
+
+        tr.appendChild(
+            actionTd
+        );
+
+
+        tbody.appendChild(
+            tr
+        );
+
+    });
+
+}
+
+
+/* =========================
+   SEARCH EVENTS
+========================= */
+
+function searchEvents() {
+
+    const keyword =
+        document
+            .getElementById(
+                "eventSearch"
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    if (keyword === "") {
+
+        displayEvents(events);
+
+
+        document.getElementById(
+            "eventRecordCount"
+        ).textContent =
+            events.length +
+            " record(s) found.";
+
+
+        return;
+
+    }
+
+
+    const filtered =
+        events.filter(event => {
+
+            const searchableText = [
+
+                event.event_id,
+
+                event.event_name,
+                event.name,
+                event.title,
+
+                event.venue_name,
+                event.venue,
+                event.venue_id,
+
+                event.event_date,
+                event.date,
+                event.event_datetime,
+
+                event.status
+
+            ]
+                .join(" ")
+                .toLowerCase();
+
+
+            return searchableText.includes(
+                keyword
+            );
+
+        });
+
+
+    displayEvents(filtered);
+
+
+    document.getElementById(
+        "eventRecordCount"
+    ).textContent =
+        filtered.length +
+        " record(s) found.";
+
+}
+
+
+/* =========================
+   CLEAR EVENT SEARCH
+========================= */
+
+function clearEventSearch() {
+
+    const search =
+        document.getElementById(
+            "eventSearch"
+        );
+
+
+    search.value = "";
+
+    displayEvents(events);
+
+
+    document.getElementById(
+        "eventRecordCount"
+    ).textContent =
+        events.length +
+        " record(s) found.";
+
+
+    search.focus();
+
+}
+
+
+/* =========================
+   ADD / UPDATE EVENT
+========================= */
+
+document
+    .getElementById(
+        "eventForm"
+    )
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const message =
+                document.getElementById(
+                    "eventMessage"
+                );
+
+
+            message.textContent = "";
+
+            message.className =
+                "message";
+
+
+            const body = {
+
+    title:
+        document
+            .getElementById("eventName")
+            .value
+            .trim(),
+
+    venue_id:
+        Number(
+            document
+                .getElementById("venueId")
+                .value
+        ),
+
+    event_date:
+        document
+            .getElementById("eventDate")
+            .value,
+
+    ticket_price:
+        Number(
+            document
+                .getElementById("ticketPrice")
+                .value
+        ),
+
+    total_tickets:
+        Number(
+            document
+                .getElementById("availableTickets")
+                .value
+        ),
+
+    status:
+        document
+            .getElementById("eventStatus")
+            .value
+            .toLowerCase(),
+
+    description:
+        document
+            .getElementById("eventDescription")
+            .value
+            .trim()
+};
+
+
+            try {
+
+                if (
+                    editingEventId === null
+                ) {
+
+                    const result =
+                        await request(
+                            "POST",
+                            EVENTS_API,
+                            body
+                        );
+
+
+                    message.textContent =
+                        result.message ||
+                        "Event created successfully.";
+
+
+                } else {
+
+                    const result =
+                        await request(
+                            "PUT",
+                            EVENTS_API +
+                            "?id=" +
+                            editingEventId,
+                            body
+                        );
+
+
+                    message.textContent =
+                        result.message ||
+                        "Event updated successfully.";
+
+                }
+
+
+                message.classList.add(
+                    "success-message"
+                );
+
+
+                resetEventForm();
+
+                await loadEvents();
+
+
+            } catch (error) {
+
+                message.textContent =
+                    error.message;
+
+
+                message.classList.add(
+                    "error-message"
+                );
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   EDIT EVENT
+========================= */
+
+function editEvent(eventId) {
+
+    const event =
+        events.find(item => {
+
+            return (
+                Number(item.event_id)
+                ===
+                Number(eventId)
+            );
+
+        });
+
+
+    if (!event) {
+
+        return;
+
+    }
+
+
+    editingEventId =
+        eventId;
+
+
+    document.getElementById(
+        "eventName"
+    ).value =
+        event.event_name ||
+        event.name ||
+        event.title ||
+        "";
+
+
+    document.getElementById(
+        "venueId"
+    ).value =
+        event.venue_id || "";
+
+
+    /*
+       Convert MySQL datetime
+       to datetime-local format.
+    */
+
+    let eventDate =
+        event.event_date ||
+        event.date ||
+        event.event_datetime ||
+        "";
+
+
+    if (eventDate) {
+
+        eventDate =
+            String(eventDate)
+                .replace(" ", "T")
+                .substring(0, 16);
+
+    }
+
+
+    document.getElementById(
+        "eventDate"
+    ).value =
+        eventDate;
+
+
+    document.getElementById(
+        "ticketPrice"
+    ).value =
+        event.ticket_price ||
+        event.price ||
+        0;
+
+
+    document.getElementById(
+    "availableTickets"
+).value =
+    event.total_tickets ??
+    event.available_tickets ??
+    0;
+
+
+    document.getElementById(
+        "eventStatus"
+    ).value =
+        String(
+            event.status ||
+            "draft"
+        ).toLowerCase();
+
+
+    document.getElementById(
+        "eventDescription"
+    ).value =
+        event.description ||
+        "";
+
+
+    document.getElementById(
+        "eventFormTitle"
+    ).textContent =
+        "Edit Event #" +
+        eventId;
+
+
+    document.getElementById(
+        "saveEventBtn"
+    ).textContent =
+        "Update Event";
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =========================
+   RESET EVENT FORM
+========================= */
+
+function resetEventForm() {
+
+    editingEventId = null;
+
+
+    document
+        .getElementById(
+            "eventForm"
+        )
+        .reset();
+
+
+    document.getElementById(
+        "eventFormTitle"
+    ).textContent =
+        "Add New Event";
+
+
+    document.getElementById(
+        "saveEventBtn"
+    ).textContent =
+        "Add Event";
+
+}
+
+
+/* =========================
+   DELETE EVENT
+========================= */
+
+async function deleteEvent(eventId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete Event #" +
+            eventId +
+            "?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await request(
+            "DELETE",
+            EVENTS_API +
+            "?id=" +
+            eventId
+        );
+
+
+        alert(
+            "Event deleted successfully."
+        );
+
+
+        resetEventForm();
+
+        await loadEvents();
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+   LOAD BOOKINGS
+========================= */
+
+async function loadBookings() {
+
+    try {
+
+        const result =
+            await request(
+                "GET",
+                BOOKINGS_API
+            );
+
+
+        bookings =
+            result.data ||
+            result.bookings ||
+            [];
+
+
+        /*
+           Arrange IDs:
+           1, 2, 3...
+        */
+
+        bookings.sort(
+            (a, b) =>
+                Number(a.booking_id) -
+                Number(b.booking_id)
+        );
+
+
+        document.getElementById(
+            "totalBookings"
+        ).textContent =
+            bookings.length;
+
+
+        displayBookings(
+            bookings
+        );
+
+
+        document.getElementById(
+            "bookingRecordCount"
+        ).textContent =
+            bookings.length +
+            " record(s) found.";
+
+
+        const search =
+            document.getElementById(
+                "bookingSearch"
+            );
+
+
+        if (
+            search &&
+            search.value.trim() !== ""
+        ) {
+
+            searchBookings();
+
+        }
+
+
+    } catch (error) {
+
+        document.getElementById(
+            "bookingRecordCount"
+        ).textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* =========================
+   DISPLAY BOOKINGS
+========================= */
+
+function displayBookings(records) {
+
+    const tbody =
+        document.getElementById(
+            "bookingRows"
+        );
+
+
+    tbody.replaceChildren();
+
+
+    if (records.length === 0) {
+
+        const tr =
+            document.createElement("tr");
+
+        const td =
+            document.createElement("td");
+
+
+        td.colSpan = 6;
+
+        td.className =
+            "empty-row";
+
+        td.textContent =
+            "No booking records found.";
+
+
+        tr.appendChild(td);
+
+        tbody.appendChild(tr);
+
+        return;
+
+    }
+
+
+    records.forEach(booking => {
+
+        const tr =
+            document.createElement("tr");
+
+
+        addCell(
+            tr,
+            booking.booking_id
+        );
+
+
+        addCell(
+            tr,
+            booking.customer_id ??
+            booking.user_id
+        );
+
+
+        addCell(
+            tr,
+            booking.event_id
+        );
+
+
+        addCell(
+            tr,
+            booking.quantity
+        );
+
+
+        addCell(
+            tr,
+            booking.total_price
+        );
+
+
+        const status =
+            booking.booking_status ||
+            booking.status ||
+            "-";
+
+
+        const statusTd =
+            document.createElement("td");
+
+
+        statusTd.appendChild(
+            createStatus(status)
+        );
+
+
+        tr.appendChild(
+            statusTd
+        );
+
+
+        tbody.appendChild(
+            tr
+        );
+
+    });
+
+}
+
+
+/* =========================
+   SEARCH BOOKINGS
+========================= */
+
+function searchBookings() {
+
+    const keyword =
+        document
+            .getElementById(
+                "bookingSearch"
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    if (keyword === "") {
+
+        displayBookings(
+            bookings
+        );
+
+
+        document.getElementById(
+            "bookingRecordCount"
+        ).textContent =
+            bookings.length +
+            " record(s) found.";
+
+
+        return;
+
+    }
+
+
+    const filtered =
+        bookings.filter(booking => {
+
+            const searchableText = [
+
+                booking.booking_id,
+
+                booking.customer_id,
+                booking.user_id,
+
+                booking.event_id,
+
+                booking.quantity,
+
+                booking.total_price,
+
+                booking.booking_status,
+                booking.status
+
+            ]
+                .join(" ")
+                .toLowerCase();
+
+
+            return searchableText.includes(
+                keyword
+            );
+
+        });
+
+
+    displayBookings(
+        filtered
+    );
+
+
+    document.getElementById(
+        "bookingRecordCount"
+    ).textContent =
+        filtered.length +
+        " record(s) found.";
+
+}
+
+
+/* =========================
+   CLEAR BOOKING SEARCH
+========================= */
+
+function clearBookingSearch() {
+
+    const search =
+        document.getElementById(
+            "bookingSearch"
+        );
+
+
+    search.value = "";
+
+
+    displayBookings(
+        bookings
+    );
+
+
+    document.getElementById(
+        "bookingRecordCount"
+    ).textContent =
+        bookings.length +
+        " record(s) found.";
+
+
+    search.focus();
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "user"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+async function initialiseDashboard() {
+
+    await loadEvents();
+
+    await loadBookings();
+
+}
+
+
+initialiseDashboard();
+
+</script>
+
+</body>
+</html>
